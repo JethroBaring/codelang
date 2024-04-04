@@ -1,0 +1,19 @@
+Context Free Grammars for CODE
+
+expression -> literal | unary | binary | grouping
+literal -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL
+grouping -> '(' expression ')'
+unary ->  ( '-' | '!' ) expression
+binary -> expression operator expression
+operator -> '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/'
+
+
+expression -> equality
+primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")"
+unary -> ( "!" | "-" ) | primary
+factor -> unary ( ( "/" | "*" ) unary )*
+equality -> comparison ( ( "!=" | "==" ) comparison )*
+comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
+term -> factor ( ( "-" | "+" ) factor )*
+
+program -> "BEGIN" "CODE" statement* "END" "CODE" EOF 
