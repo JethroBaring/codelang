@@ -17,6 +17,7 @@ public class Scanner {
     keywords = new HashMap<>();
     keywords.put("BEGIN", TokenType.BEGIN);
     keywords.put("END", TokenType.END);
+    keywords.put("CODE", TokenType.CODE);
     keywords.put("DISPLAY", TokenType.DISPLAY);
     keywords.put("null", TokenType.NULL);
     keywords.put("SCAN", TokenType.SCAN);
@@ -53,6 +54,7 @@ public class Scanner {
         break;
       case ')':
         addToken(TokenType.RIGHT_PARENTHESIS, null);
+        break;
       case '[':
         if (peekNext() == ']') {
           char escapedCharacter = advance();
@@ -60,7 +62,7 @@ public class Scanner {
           addToken(TokenType.CHAR, escapedCharacter);
           advance();
         } else {
-          addToken(TokenType.LEFT_BRACKET);
+          addToken(TokenType.RIGHT_BRACKET);
         }
         break;
       case ']':
@@ -90,11 +92,35 @@ public class Scanner {
       case '/':
         addToken(TokenType.SLASH);
         break;
+      case '&':
+        addToken(TokenType.AMPERSAND);
+        break;
       case '=':
-        addToken(TokenType.EQUAL);
+        if (match('=')) {
+          addToken(TokenType.EQUAL_EQUAL);
+        } else {
+          addToken(TokenType.EQUAL);
+        }
+        break;
+      case '>':
+        if (match('=')) {
+          addToken(TokenType.GREATER_THAN_EQUAL);
+        } else {
+          addToken(TokenType.GREATER_THAN);
+        }
+        break;
+      case '<':
+        if (match('=')) {
+          addToken(TokenType.LESS_THAN_EQUAL);
+        } else {
+          addToken(TokenType.LESS_THAN);
+        }
+        break;
+      case ';':
+        addToken(TokenType.SEMICOLON);
         break;
       case '#':
-        while (peek() != '\n' && !isAtEnd())
+        while (!isAtNewLine() && !isAtEnd())
           advance();
         break;
       case '\0':
@@ -150,7 +176,10 @@ public class Scanner {
   }
 
   private boolean isAtNewLine() {
-    return source.charAt(current) == '\n';
+    if (current < source.length()) {
+      return source.charAt(current) == '\n';
+    }
+    return false;
   }
 
   private boolean isAlpha(char c) {
@@ -207,7 +236,6 @@ public class Scanner {
     } else if (value.equals("FALSE")) {
       addToken(TokenType.FALSE_LITERAL, value);
     } else {
-      System.out.println(value);
       addToken(TokenType.STRING_LITERAL, value);
     }
   }

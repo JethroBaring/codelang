@@ -16,6 +16,7 @@ enum TokenType {
     MINUS,
     STAR,
     HASH,
+    SEMICOLON,
 
     // One or two character tokens
     NOT,
@@ -26,7 +27,6 @@ enum TokenType {
     GREATER_THAN_EQUAL,
     LESS_THAN,
     LESS_THAN_EQUAL,
-
     // Literals
     IDENTIFIER,
     STRING,

@@ -1,5 +1,12 @@
 Context Free Grammars for CODE
 
+program -> BEGIN CODE declaration* END CODE EOF 
+declaration -> varDeclaration | statement
+varDeclaration -> ("STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
+statement -> exprStmt | printStmt
+exprStmt -> expression
+printStmt -> "print" expression
+
 expression -> literal | unary | binary | grouping
 literal -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL
 grouping -> '(' expression ')'
@@ -7,13 +14,12 @@ unary ->  ( '-' | '!' ) expression
 binary -> expression operator expression
 operator -> '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/'
 
-
 expression -> equality
-primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")"
+primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")" | IDENTIFIER
 unary -> ( "!" | "-" ) | primary
 factor -> unary ( ( "/" | "*" ) unary )*
 equality -> comparison ( ( "!=" | "==" ) comparison )*
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
 term -> factor ( ( "-" | "+" ) factor )*
 
-program -> "BEGIN" "CODE" statement* "END" "CODE" EOF 
+

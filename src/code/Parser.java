@@ -1,5 +1,6 @@
 package code;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -14,16 +15,45 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
-        } catch (ParseError error) {
-            return null;
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        consume(TokenType.BEGIN, "Expecting BEGIN.");
+        consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
+
+        while (!isAtEnd() && !check(TokenType.END)) {
+            statements.add(statement());
         }
+
+        consume(TokenType.END, "Expecting END.");
+        consume(TokenType.CODE, "Expecting 'CODE' after END");
+
+        return statements;
     }
 
     private Expr expression() {
         return equality();
+    }
+
+    private Stmt statement() {
+        if (match(TokenType.DISPLAY)) {
+            consume(TokenType.COLON, "Expecting ':' after DISPLAY");
+            return displayStatement();
+        }
+
+        return expressionStatement();
+    }
+
+    private Stmt displayStatement() {
+        Expr value = expression();
+        // consume(TokenType.SEMICOLON, "Expect ';' after value");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        // consume(TokenType.SEMICOLON, "Expect ';' after expression");
+        return new Stmt.Expression(expr);
     }
 
     private Expr equality() {
@@ -115,7 +145,7 @@ public class Parser {
         advance();
 
         while (!isAtEnd()) {
-            if (previous().type == TokenType.COLON)
+            if (previous().type == TokenType.SEMICOLON)
                 return;
             switch (peek().type) {
                 case STRING:
@@ -137,7 +167,7 @@ public class Parser {
     }
 
     private boolean isAtEnd() {
-        return peek().type != TokenType.EOF;
+        return peek().type == TokenType.EOF;
     }
 
     private Token peek() {

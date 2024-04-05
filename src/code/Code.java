@@ -9,7 +9,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Code {
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -35,21 +37,32 @@ public class Code {
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
+            String linePrompts = "BEGIN CODE " + line +" END CODE"; 
             if (line == null)
                 break;
-            run(line);
+            run(linePrompts);
         }
     }
 
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
+
+        // List<Token> tokens = scanner.scanTokens();
+        // for (Token token : tokens) {
+        // System.out.println(token);
+        // }
+
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         if (hadError)
-            return;
-        System.out.println(new AstPrinter().print(expression));
+            System.exit(65);
+
+        if (hadRuntimeError)
+            System.exit(70);
+
+        interpreter.interpret(statements);
     }
 
     static void error(int line, int col, String message) {
@@ -74,6 +87,12 @@ public class Code {
         System.err.println(
                 "[Ln " + line + ", Col " + col + "] Error" + where + ": " + message);
         hadError = true;
+    }
+
+    static void runtimeError(RuntimeError e) {
+        System.err.println(e.getMessage() +
+                "\n[line " + e.token.line + "]");
+        hadRuntimeError = true;
     }
 
 }
