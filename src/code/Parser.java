@@ -22,7 +22,7 @@ public class Parser {
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
         while (!isAtEnd() && !check(TokenType.END)) {
-            statements.add(statement());
+            statements.add(declaration());
         }
 
         consume(TokenType.END, "Expecting END.");
@@ -32,7 +32,38 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if (match(TokenType.EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Stmt declaration() {
+        try {
+            if (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
+                return varDeclaration();
+            }
+
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
     }
 
     private Stmt statement() {
@@ -48,6 +79,29 @@ public class Parser {
         Expr value = expression();
         // consume(TokenType.SEMICOLON, "Expect ';' after value");
         return new Stmt.Print(value);
+    }
+
+    private Stmt varDeclaration() {
+        Token token = previous();
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+        Expr initializer = null;
+
+        if (match(TokenType.EQUAL)) {
+            initializer = expression();
+        }
+
+        switch (token.type) {
+            case STRING:
+                return new Stmt.String(name, initializer);
+            case CHAR:
+                return new Stmt.Char(name, initializer);
+            case INT:
+                return new Stmt.Int(name, initializer);
+            case FLOAT:
+                return new Stmt.Float(name, initializer);
+            default:
+                return new Stmt.Bool(name, initializer);
+        }
     }
 
     private Stmt expressionStatement() {
@@ -125,6 +179,9 @@ public class Parser {
             Expr expr = expression();
             consume(TokenType.RIGHT_PARENTHESIS, "Expect ')' after expression");
             return new Expr.Grouping(expr);
+        }
+        if (match(TokenType.IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
         throw error(peek(), "Expect expression.");
     }

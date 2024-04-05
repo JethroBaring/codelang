@@ -2,14 +2,22 @@ package code;
 
 import java.util.List;
 
+import code.Expr.Assign;
 import code.Expr.Binary;
 import code.Expr.Grouping;
 import code.Expr.Literal;
 import code.Expr.Unary;
+import code.Expr.Variable;
+import code.Stmt.Bool;
+import code.Stmt.Char;
 import code.Stmt.Expression;
+import code.Stmt.Float;
+import code.Stmt.Int;
 import code.Stmt.Print;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
+
+    private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements) {
         try {
@@ -207,5 +215,92 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+
+    @Override
+    public Object visitStringStmt(Stmt.String stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+            if (value instanceof String) {
+                environment.define(stmt.name.lexeme, value);
+            } else {
+                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type String.");
+            }
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitIntStmt(Int stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+            if (value instanceof Integer) {
+                environment.define(stmt.name.lexeme, value);
+            } else {
+                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Integer.");
+            }
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitFloatStmt(Float stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+            if (value instanceof Float) {
+                environment.define(stmt.name.lexeme, value);
+            } else {
+                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
+            }
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitCharStmt(Char stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+            if (value instanceof Character) {
+                environment.define(stmt.name.lexeme, value);
+            } else {
+                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Character.");
+            }
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitBoolStmt(Bool stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+            if (value instanceof Boolean) {
+                environment.define(stmt.name.lexeme, value);
+            } else {
+                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Boolean.");
+            }
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitVariableExpr(Variable expr) {
+        return environment.get(expr.name);
+    }
+
+    @Override
+    public Object visitAssignExpr(Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
     }
 }

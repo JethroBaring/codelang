@@ -1,9 +1,17 @@
 Context Free Grammars for CODE
 
-program -> BEGIN CODE declaration* END CODE EOF 
-declaration -> varDeclaration | statement
+* = zero or more
++ = atleast once
+? = optional
+| = or
+
+v0.2
+program -> "BEGIN" "CODE" declaration* statement* "END" "CODE" EOF 
+declaration -> varDeclaration
 varDeclaration -> ("STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
-statement -> exprStmt | printStmt
+statement -> exprStmt | printStmt | block
+block -> ( "IF" | "WHILE" ) expression blockContent
+blockContent -> statement*
 exprStmt -> expression
 printStmt -> "print" expression
 
@@ -14,7 +22,8 @@ unary ->  ( '-' | '!' ) expression
 binary -> expression operator expression
 operator -> '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/'
 
-expression -> equality
+expression -> assignment
+assignment -> IDENTIFIER "=" assignment | equality
 primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")" | IDENTIFIER
 unary -> ( "!" | "-" ) | primary
 factor -> unary ( ( "/" | "*" ) unary )*
@@ -22,4 +31,11 @@ equality -> comparison ( ( "!=" | "==" ) comparison )*
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
 term -> factor ( ( "-" | "+" ) factor )*
 
-
+v0.1
+program -> "BEGIN" "CODE" declaration* "END" "CODE" EOF 
+declaration -> varDeclaration | statement
+varDeclaration -> ("STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
+statement -> exprStmt | printStmt | block
+block -> "BEGIN" ("IF" | "WHILE" )
+exprStmt -> expression
+printStmt -> "print" expression

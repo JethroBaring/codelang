@@ -3,37 +3,109 @@ package code;
 import java.util.List;
 
 abstract class Stmt {
-   interface Visitor<R> {
-      R visitExpressionStmt(Expression stmt);
+interface Visitor<R> {
+R visitExpressionStmt(Expression stmt);
+R visitPrintStmt(Print stmt);
+R visitStringStmt(String stmt);
+R visitIntStmt(Int stmt);
+R visitFloatStmt(Float stmt);
+R visitCharStmt(Char stmt);
+R visitBoolStmt(Bool stmt);
+}
+static class Expression extends Stmt {
+   Expression(Expr expression) {
+this.expression = expression;
+}
 
-      R visitPrintStmt(Print stmt);
-   }
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitExpressionStmt(this);
+}
 
-   static class Expression extends Stmt {
-      Expression(Expr expression) {
-         this.expression = expression;
-      }
+final Expr expression;
+}
+static class Print extends Stmt {
+   Print(Expr expression) {
+this.expression = expression;
+}
 
-      @Override
-      <R> R accept(Visitor<R> visitor) {
-         return visitor.visitExpressionStmt(this);
-      }
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitPrintStmt(this);
+}
 
-      final Expr expression;
-   }
+final Expr expression;
+}
+static class String extends Stmt {
+   String(Token name, Expr initializer) {
+this.name = name;
+this.initializer = initializer;
+}
 
-   static class Print extends Stmt {
-      Print(Expr expression) {
-         this.expression = expression;
-      }
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitStringStmt(this);
+}
 
-      @Override
-      <R> R accept(Visitor<R> visitor) {
-         return visitor.visitPrintStmt(this);
-      }
+final Token name;
+final Expr initializer;
+}
+static class Int extends Stmt {
+   Int(Token name, Expr initializer) {
+this.name = name;
+this.initializer = initializer;
+}
 
-      final Expr expression;
-   }
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitIntStmt(this);
+}
 
-   abstract <R> R accept(Visitor<R> visitor);
+final Token name;
+final Expr initializer;
+}
+static class Float extends Stmt {
+   Float(Token name, Expr initializer) {
+this.name = name;
+this.initializer = initializer;
+}
+
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitFloatStmt(this);
+}
+
+final Token name;
+final Expr initializer;
+}
+static class Char extends Stmt {
+   Char(Token name, Expr initializer) {
+this.name = name;
+this.initializer = initializer;
+}
+
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitCharStmt(this);
+}
+
+final Token name;
+final Expr initializer;
+}
+static class Bool extends Stmt {
+   Bool(Token name, Expr initializer) {
+this.name = name;
+this.initializer = initializer;
+}
+
+@Override
+<R> R accept(Visitor<R> visitor) {
+return visitor.visitBoolStmt(this);
+}
+
+final Token name;
+final Expr initializer;
+}
+
+abstract <R> R accept(Visitor<R> visitor);
 }
