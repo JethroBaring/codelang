@@ -18,6 +18,7 @@ enum TokenType {
     STAR,
     HASH,
     SEMICOLON,
+    DOLLAR_SIGN,
 
     // One or two character tokens
     NOT,
@@ -28,6 +29,7 @@ enum TokenType {
     GREATER_THAN_EQUAL,
     LESS_THAN,
     LESS_THAN_EQUAL,
+
     // Literals
     IDENTIFIER,
     STRING,
@@ -54,6 +56,8 @@ enum TokenType {
     WHILE,
     AND,
     OR,
+    FUNCTION,
+    ELSE_IF,
 
     EOF,
 }

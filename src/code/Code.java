@@ -48,19 +48,19 @@ public class Code {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
 
-        // List<Token> tokens = scanner.scanTokens();
-        // for (Token token : tokens) {
-        // System.out.println(token);
-        // }
-
         List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens);
-        List<Stmt> statements = parser.parse();
-        if (hadError)
-            System.exit(65);
-        if (hadRuntimeError)
-            System.exit(70);
-        interpreter.interpret(statements);
+        for (Token token : tokens) {
+        System.out.println(token);
+        }
+
+        // List<Token> tokens = scanner.scanTokens();
+        // Parser parser = new Parser(tokens);
+        // List<Stmt> statements = parser.parse();
+        // if (hadError)
+        //     System.exit(65);
+        // if (hadRuntimeError)
+        //     System.exit(70);
+        // interpreter.interpret(statements);
     }
 
     static void error(int line, int col, String message) {

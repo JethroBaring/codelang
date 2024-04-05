@@ -14,10 +14,13 @@ import code.Stmt.Bool;
 import code.Stmt.Char;
 import code.Stmt.Expression;
 import code.Stmt.Float;
+import code.Stmt.Function;
 import code.Stmt.If;
 import code.Stmt.Int;
 import code.Stmt.Print;
+import code.Stmt.Scan;
 import code.Stmt.While;
+import java.util.Scanner;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
@@ -106,14 +109,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                     return (double) left * (double) right;
                 }
             case PLUS:
+                checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left + (int) right;
                 } else if (left instanceof Double && right instanceof Double) {
                     return (double) left * (double) right;
-                } else if (left instanceof String && right instanceof String) {
-                    return (String) left + (String) right;
                 }
-                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
+                break;
+            case AMPERSAND:
+                return left.toString() + right.toString();
             case MODULO:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
@@ -121,8 +125,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 } else {
                     return (double) left % (double) right;
                 }
-            case AMPERSAND:
-                return (String) left + (String) right;
             case EQUAL_EQUAL:
                 return isEqual(left, right);
             case NOT_EQUAL:
@@ -158,6 +160,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 } else {
                     return -(double) right;
                 }
+            case PLUS:
+                checkNumberOperand(expr.operator, right);
+                if (right instanceof Integer) {
+                    return +(int) right;
+                } else {
+                    return +(double) right;
+                }
             default:
                 break;
         }
@@ -173,10 +182,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         stmt.accept(this);
     }
 
-    void executeBlock(List<Stmt> statements) {
-        for (Stmt statement : statements) {
-            execute(statement);
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+        try {
+            this.environment = environment;
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.environment = previous;
         }
+
     }
 
     private boolean isTruthy(Object object) {
@@ -282,7 +298,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof Float) {
+            if (value instanceof Double) {
                 environment.define(stmt.name.lexeme, value);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
@@ -336,7 +352,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitBlockStmt(Block stmt) {
-        executeBlock(stmt.statements);
+        executeBlock(stmt.statements, new Environment(environment));
 
         return null;
     }
@@ -382,4 +398,27 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitFunctionStmt(Function stmt) {
+        throw new UnsupportedOperationException("Unimplemented method 'visitFunctionStmt'");
+    }
+
+    @Override
+    public Object visitScanStmt(Scan stmt) {
+        Scanner scanner = new java.util.Scanner(System.in);
+        String line = scanner.nextLine();
+
+        code.Scanner tokenizer = new code.Scanner(line);
+        List<Token> tokens = tokenizer.scanTokens();
+
+        int current = 0;
+        int current2 = 0;
+        while(current2 < stmt.identifiers.size()) {
+            Object value = tokens.get(current).literal;
+            environment.assign(stmt.identifiers.get(current2), value);
+            current+=2;
+            current2++;
+        }
+        return null;
+    }
 }

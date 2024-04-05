@@ -1,0 +1,23 @@
+BEGIN HEADER STDLIB
+
+    FN CALL(STRING x, STRING y)
+    BEGIN FN
+
+    END FN
+
+    FN CALL(STRING x, STRING y)
+    BEGIN FN
+        
+    END FN
+
+    FN CALL(STRING x, STRING y)
+    BEGIN FN
+        
+    END FN
+
+    FN CALL(STRING x, STRING y)
+    BEGIN FN
+        
+    END FN
+
+END HEADER

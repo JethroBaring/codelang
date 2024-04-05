@@ -19,6 +19,7 @@ public class Scanner {
     keywords.put("END", TokenType.END);
     keywords.put("CODE", TokenType.CODE);
     keywords.put("DISPLAY", TokenType.DISPLAY);
+    keywords.put("SCAN", TokenType.SCAN);
     keywords.put("null", TokenType.NULL);
     keywords.put("SCAN", TokenType.SCAN);
     keywords.put("STRING", TokenType.STRING);
@@ -31,6 +32,8 @@ public class Scanner {
     keywords.put("WHILE", TokenType.WHILE);
     keywords.put("AND", TokenType.AND);
     keywords.put("OR", TokenType.OR);
+    keywords.put("NOT", TokenType.NOT);
+    keywords.put("FN", TokenType.FUNCTION);
 
   }
 
@@ -64,7 +67,7 @@ public class Scanner {
         if (peekNext() == ']') {
           char escapedCharacter = advance();
           start += 1;
-          addToken(TokenType.CHAR, escapedCharacter);
+          addToken(TokenType.CHAR_LITERAL, escapedCharacter);
           advance();
         } else {
           addToken(TokenType.RIGHT_BRACKET);
@@ -99,6 +102,9 @@ public class Scanner {
         break;
       case '&':
         addToken(TokenType.AMPERSAND);
+        break;
+      case '$':
+        addToken(TokenType.DOLLAR_SIGN, '\n');
         break;
       case '%':
         addToken(TokenType.MODULO);

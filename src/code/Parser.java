@@ -3,6 +3,8 @@ package code;
 import java.util.ArrayList;
 import java.util.List;
 
+import code.Stmt.Function;
+
 public class Parser {
 
     private static class ParseError extends RuntimeException {
@@ -17,6 +19,9 @@ public class Parser {
 
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
+        while (match(TokenType.FUNCTION) && !isAtEnd()) {
+            function("function");
+        }
 
         consume(TokenType.BEGIN, "Expecting BEGIN.");
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
@@ -100,11 +105,17 @@ public class Parser {
             return displayStatement();
         }
 
+        if (match(TokenType.SCAN)) {
+            consume(TokenType.COLON, "Expecting ':' after SCAN");
+            return scanStatement();
+        }
+
         if (match(TokenType.IF)) {
             return ifStatement();
         } else if (match(TokenType.WHILE)) {
             return whileStatement();
         }
+
         return expressionStatement();
     }
 
@@ -114,6 +125,16 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt scanStatement() {
+        List<Token> identifiers = new ArrayList<>();
+
+        do {
+            identifiers.add(consume(TokenType.IDENTIFIER, "Expecting identifier after 'scan'."));
+        } while (match(TokenType.COMMA));
+
+        return new Stmt.Scan(identifiers);
+    }
+
     private Stmt ifStatement() {
         consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
         Expr condition = expression();
@@ -121,7 +142,6 @@ public class Parser {
 
         consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
         consume(TokenType.IF, "Expecting an IF after BEGIN");
-
 
         List<Stmt> thenBranch = new ArrayList<>();
         while (!isAtEnd() && !check(TokenType.END)) {
@@ -200,33 +220,45 @@ public class Parser {
         return new Stmt.Expression(expr);
     }
 
-    private List<Stmt> block(TokenType type) {
-        String token = "";
+    private Function function(String kind) {
+        Token name = consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
+        consume(TokenType.LEFT_PARENTHESIS, "Expect '(' after " + kind + " name.");
+        List<Parameter> parameters = new ArrayList<>();
 
-        switch (type) {
-            case IF:
-                token = "IF";
-                break;
-            case WHILE:
-                token = "WHILE";
-            default:
-                break;
+        if (!check(TokenType.RIGHT_PARENTHESIS)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+
+                Token type = consume(advance().type, "Expect parameter type.");
+                Token paramName = consume(advance().type, "Expect parameter name.");
+                parameters.add(new Parameter(type, paramName));
+
+            } while (match(TokenType.COMMA));
         }
 
-        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after " + token + ".");
-        Expr expr = expression();
-        consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
+        consume(TokenType.RIGHT_PARENTHESIS, "Expect ')' after parameters.");
 
-        consume(TokenType.BEGIN, "Expecting a BEGIN after " + token + " Condition.");
-        consume(type, "Expecting an " + token + " after BEGIN");
+        consume(TokenType.BEGIN, "Expect 'BEGIN' before 'FN'.");
+        consume(TokenType.FUNCTION, "Expect 'FN' before " + kind + " body.");
+
+        List<Stmt> body = block(TokenType.FUNCTION);
+
+        return new Stmt.Function(name, parameters, body);
+    }
+
+    private List<Stmt> block(TokenType type) {
 
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd() && !check(TokenType.END)) {
             statements.add(statement());
         }
 
-        consume(TokenType.END, "Expecting END.");
-        consume(TokenType.CODE, "Expecting " + token + " after END");
+        consume(TokenType.END, "Expect 'END' after function body.");
+        if (peek().type == type) {
+            consume(peek().type, "Expecting 'FN' after END");
+        }
 
         return statements;
     }
@@ -256,7 +288,7 @@ public class Parser {
     private Expr term() {
         Expr expr = factor();
 
-        while (match(TokenType.MINUS, TokenType.PLUS)) {
+        while (match(TokenType.MINUS, TokenType.PLUS, TokenType.AMPERSAND)) {
             Token operator = previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
@@ -277,7 +309,7 @@ public class Parser {
     }
 
     private Expr unary() {
-        if (match(TokenType.NOT, TokenType.MINUS)) {
+        if (match(TokenType.NOT, TokenType.MINUS, TokenType.PLUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
@@ -294,7 +326,7 @@ public class Parser {
         if (match(TokenType.NULL))
             return new Expr.Literal(null);
         if (match(TokenType.STRING_LITERAL, TokenType.CHAR_LITERAL,
-                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL))
+                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL, TokenType.DOLLAR_SIGN))
             return new Expr.Literal(previous().literal);
         if (match(TokenType.LEFT_PARENTHESIS)) {
             Expr expr = expression();

@@ -8,9 +8,13 @@ abstract class Stmt {
 
       R visitExpressionStmt(Expression stmt);
 
+      R visitFunctionStmt(Function stmt);
+
       R visitIfStmt(If stmt);
 
       R visitPrintStmt(Print stmt);
+
+      R visitScanStmt(Scan stmt);
 
       R visitWhileStmt(While stmt);
 
@@ -51,6 +55,23 @@ abstract class Stmt {
       final Expr expression;
    }
 
+   static class Function extends Stmt {
+      Function(Token name, List<Parameter> params, List<Stmt> body) {
+         this.name = name;
+         this.params = params;
+         this.body = body;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitFunctionStmt(this);
+      }
+
+      final Token name;
+      final List<Parameter> params;
+      final List<Stmt> body;
+   }
+
    static class If extends Stmt {
       If(Expr condition, List<Stmt> thenBranch, List<Stmt> elseBranch) {
          this.condition = condition;
@@ -79,6 +100,21 @@ abstract class Stmt {
       }
 
       final Expr expression;
+   }
+
+   static class Scan extends Stmt {
+
+      Scan(List<Token> identifiers) {
+         this.identifiers = identifiers;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitScanStmt(this);
+      }
+
+      List<Token> identifiers;
+
    }
 
    static class While extends Stmt {

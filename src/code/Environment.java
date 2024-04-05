@@ -59,8 +59,8 @@ public class Environment {
                     return;
                 }
                 type = "Integer";
-            } else if (val instanceof Float) {
-                if (value instanceof Float) {
+            } else if (val instanceof Double) {
+                if (value instanceof Double) {
                     values.put(name.lexeme, value);
                     return;
                 }
