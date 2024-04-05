@@ -21,8 +21,12 @@ public class Parser {
         consume(TokenType.BEGIN, "Expecting BEGIN.");
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
+        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
+            statements.add(varDeclaration());
+        }
+
         while (!isAtEnd() && !check(TokenType.END)) {
-            statements.add(declaration());
+            statements.add(statement());
         }
 
         consume(TokenType.END, "Expecting END.");
@@ -36,7 +40,7 @@ public class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = or();
 
         if (match(TokenType.EQUAL)) {
             Token equals = previous();
@@ -53,18 +57,42 @@ public class Parser {
         return expr;
     }
 
-    private Stmt declaration() {
-        try {
-            if (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
-                return varDeclaration();
-            }
+    private Expr or() {
+        Expr expr = and();
 
-            return statement();
-        } catch (ParseError error) {
-            synchronize();
-            return null;
+        while (match(TokenType.OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
         }
+
+        return expr;
     }
+
+    private Expr and() {
+        Expr expr = equality();
+        while (match(TokenType.AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    // private Stmt declaration() {
+    // try {
+    // if (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT,
+    // TokenType.BOOL)) {
+    // return varDeclaration();
+    // }
+
+    // return statement();
+    // } catch (ParseError error) {
+    // synchronize();
+    // return null;
+    // }
+    // }
 
     private Stmt statement() {
         if (match(TokenType.DISPLAY)) {
@@ -72,6 +100,11 @@ public class Parser {
             return displayStatement();
         }
 
+        if (match(TokenType.IF)) {
+            return ifStatement();
+        } else if (match(TokenType.WHILE)) {
+            return whileStatement();
+        }
         return expressionStatement();
     }
 
@@ -79,6 +112,63 @@ public class Parser {
         Expr value = expression();
         // consume(TokenType.SEMICOLON, "Expect ';' after value");
         return new Stmt.Print(value);
+    }
+
+    private Stmt ifStatement() {
+        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
+        Expr condition = expression();
+        consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
+
+        consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
+        consume(TokenType.IF, "Expecting an IF after BEGIN");
+
+
+        List<Stmt> thenBranch = new ArrayList<>();
+        while (!isAtEnd() && !check(TokenType.END)) {
+            thenBranch.add(statement());
+        }
+
+        consume(TokenType.END, "Expecting END after a statement.");
+        consume(TokenType.IF, "Expecting IF after END");
+
+        List<Stmt> elseBranch = null;
+
+        if (match(TokenType.ELSE)) {
+            elseBranch = new ArrayList<>();
+            consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
+            consume(TokenType.IF, "Expecting an IF after BEGIN");
+
+            while (!isAtEnd() && !check(TokenType.END)) {
+                elseBranch.add(statement());
+            }
+
+            consume(TokenType.END, "Expecting END after a statement.");
+            consume(TokenType.IF, "Expecting IF after END");
+
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
+
+    }
+
+    private Stmt whileStatement() {
+        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
+        Expr condition = expression();
+        consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
+
+        consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
+        consume(TokenType.WHILE, "Expecting an IF after BEGIN");
+
+        List<Stmt> body = new ArrayList<>();
+        while (!isAtEnd() && !check(TokenType.END)) {
+            body.add(statement());
+        }
+
+        consume(TokenType.END, "Expecting END after a statement.");
+        consume(TokenType.WHILE, "Expecting IF after END");
+
+        return new Stmt.While(condition, body);
+
     }
 
     private Stmt varDeclaration() {
@@ -108,6 +198,37 @@ public class Parser {
         Expr expr = expression();
         // consume(TokenType.SEMICOLON, "Expect ';' after expression");
         return new Stmt.Expression(expr);
+    }
+
+    private List<Stmt> block(TokenType type) {
+        String token = "";
+
+        switch (type) {
+            case IF:
+                token = "IF";
+                break;
+            case WHILE:
+                token = "WHILE";
+            default:
+                break;
+        }
+
+        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after " + token + ".");
+        Expr expr = expression();
+        consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
+
+        consume(TokenType.BEGIN, "Expecting a BEGIN after " + token + " Condition.");
+        consume(type, "Expecting an " + token + " after BEGIN");
+
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd() && !check(TokenType.END)) {
+            statements.add(statement());
+        }
+
+        consume(TokenType.END, "Expecting END.");
+        consume(TokenType.CODE, "Expecting " + token + " after END");
+
+        return statements;
     }
 
     private Expr equality() {
@@ -146,7 +267,7 @@ public class Parser {
 
     private Expr factor() {
         Expr expr = unary();
-        while (match(TokenType.SLASH, TokenType.STAR)) {
+        while (match(TokenType.SLASH, TokenType.STAR, TokenType.MODULO)) {
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);

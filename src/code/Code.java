@@ -22,6 +22,7 @@ public class Code {
         } else {
             runPrompt();
         }
+        char x = 't';
     }
 
     private static void runFile(String path) throws IOException {
@@ -37,7 +38,7 @@ public class Code {
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
-            String linePrompts = "BEGIN CODE " + line +" END CODE"; 
+            String linePrompts = "BEGIN CODE " + line + " END CODE";
             if (line == null)
                 break;
             run(linePrompts);
@@ -55,13 +56,10 @@ public class Code {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
-
         if (hadError)
             System.exit(65);
-
         if (hadRuntimeError)
             System.exit(70);
-
         interpreter.interpret(statements);
     }
 

@@ -26,6 +26,11 @@ public class Scanner {
     keywords.put("INT", TokenType.INT);
     keywords.put("FLOAT", TokenType.FLOAT);
     keywords.put("BOOL", TokenType.BOOL);
+    keywords.put("IF", TokenType.IF);
+    keywords.put("ELSE", TokenType.ELSE);
+    keywords.put("WHILE", TokenType.WHILE);
+    keywords.put("AND", TokenType.AND);
+    keywords.put("OR", TokenType.OR);
 
   }
 
@@ -95,6 +100,9 @@ public class Scanner {
       case '&':
         addToken(TokenType.AMPERSAND);
         break;
+      case '%':
+        addToken(TokenType.MODULO);
+        break;
       case '=':
         if (match('=')) {
           addToken(TokenType.EQUAL_EQUAL);
@@ -138,7 +146,7 @@ public class Scanner {
         if (peekNext() == '\'') {
           char escapedCharacter = advance();
           start += 1;
-          addToken(TokenType.CHAR, escapedCharacter);
+          addToken(TokenType.CHAR_LITERAL, escapedCharacter);
           advance();
         }
         break;

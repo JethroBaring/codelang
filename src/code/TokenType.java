@@ -14,6 +14,7 @@ enum TokenType {
     SLASH,
     PLUS,
     MINUS,
+    MODULO,
     STAR,
     HASH,
     SEMICOLON,
@@ -48,6 +49,11 @@ enum TokenType {
     END,
     DISPLAY,
     SCAN,
+    IF,
+    ELSE,
+    WHILE,
+    AND,
+    OR,
 
     EOF,
 }

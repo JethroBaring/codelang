@@ -6,14 +6,18 @@ import code.Expr.Assign;
 import code.Expr.Binary;
 import code.Expr.Grouping;
 import code.Expr.Literal;
+import code.Expr.Logical;
 import code.Expr.Unary;
 import code.Expr.Variable;
+import code.Stmt.Block;
 import code.Stmt.Bool;
 import code.Stmt.Char;
 import code.Stmt.Expression;
 import code.Stmt.Float;
+import code.Stmt.If;
 import code.Stmt.Int;
 import code.Stmt.Print;
+import code.Stmt.While;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
@@ -38,30 +42,38 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
             case GREATER_THAN:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    return formatBoolean((int) left > (int) right);
+                    // return formatBoolean((int) left > (int) right);
+                    return (int) left > (int) right;
                 } else {
-                    return formatBoolean((double) left > (double) right);
+                    return (int) left < (int) right;
+                    // return formatBoolean((double) left > (double) right);
                 }
             case GREATER_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    return formatBoolean((int) left >= (int) right);
+                    // return formatBoolean((int) left >= (int) right);
+                    return (int) left >= (int) right;
                 } else {
-                    return formatBoolean((double) left >= (double) right);
+                    // return formatBoolean((double) left >= (double) right);
+                    return (int) left >= (int) right;
                 }
             case LESS_THAN:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    return formatBoolean((int) left < (int) right);
+                    // return formatBoolean((int) left < (int) right);
+                    return (int) left < (int) right;
                 } else {
-                    return formatBoolean((double) left < (double) right);
+                    // return formatBoolean((double) left < (double) right);
+                    return (int) left < (int) right;
                 }
             case LESS_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    return formatBoolean((int) left <= (int) right);
+                    // return formatBoolean((int) left <= (int) right);
+                    return (int) left <= (int) right;
                 } else {
-                    return formatBoolean((double) left <= (double) right);
+                    // return formatBoolean((double) left <= (double) right);
+                    return (int) left <= (int) right;
                 }
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
@@ -102,12 +114,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                     return (String) left + (String) right;
                 }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
+            case MODULO:
+                checkNumberOperands(expr.operator, left, right);
+                if (left instanceof Integer && right instanceof Integer) {
+                    return (int) left % (int) right;
+                } else {
+                    return (double) left % (double) right;
+                }
             case AMPERSAND:
                 return (String) left + (String) right;
             case EQUAL_EQUAL:
-                return formatBoolean(isEqual(left, right));
+                return isEqual(left, right);
             case NOT_EQUAL:
-                return formatBoolean(!isEqual(left, right));
+                return !isEqual(left, right);
             default:
                 break;
         }
@@ -152,6 +171,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    void executeBlock(List<Stmt> statements) {
+        for (Stmt statement : statements) {
+            execute(statement);
+        }
     }
 
     private boolean isTruthy(Object object) {
@@ -213,6 +238,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
+        // if ((boolean) value == true || (boolean) value == false) {
+        // System.out.println(stringify(value).toUpperCase());
+        // } else {
+        // System.out.println(stringify(value));
+        // }
         System.out.println(stringify(value));
         return null;
     }
@@ -303,4 +333,53 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         environment.assign(expr.name, value);
         return value;
     }
+
+    @Override
+    public Object visitBlockStmt(Block stmt) {
+        executeBlock(stmt.statements);
+
+        return null;
+    }
+
+    @Override
+    public Object visitIfStmt(If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            for (Stmt statement : stmt.thenBranch) {
+                execute(statement);
+            }
+        } else if (stmt.elseBranch != null) {
+            for (Stmt statement : stmt.elseBranch) {
+                execute(statement);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Logical expr) {
+        Object left = evaluate(expr.left);
+
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left))
+                return left;
+        } else {
+            if (!isTruthy(left))
+                return left;
+        }
+
+        return evaluate(expr.right);
+    }
+
+    @Override
+    public Object visitWhileStmt(While stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            for (Stmt statement : stmt.body) {
+                execute(statement);
+            }
+        }
+
+        return null;
+    }
+
 }

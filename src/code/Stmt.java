@@ -3,109 +3,173 @@ package code;
 import java.util.List;
 
 abstract class Stmt {
-interface Visitor<R> {
-R visitExpressionStmt(Expression stmt);
-R visitPrintStmt(Print stmt);
-R visitStringStmt(String stmt);
-R visitIntStmt(Int stmt);
-R visitFloatStmt(Float stmt);
-R visitCharStmt(Char stmt);
-R visitBoolStmt(Bool stmt);
-}
-static class Expression extends Stmt {
-   Expression(Expr expression) {
-this.expression = expression;
-}
+   interface Visitor<R> {
+      R visitBlockStmt(Block stmt);
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitExpressionStmt(this);
-}
+      R visitExpressionStmt(Expression stmt);
 
-final Expr expression;
-}
-static class Print extends Stmt {
-   Print(Expr expression) {
-this.expression = expression;
-}
+      R visitIfStmt(If stmt);
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitPrintStmt(this);
-}
+      R visitPrintStmt(Print stmt);
 
-final Expr expression;
-}
-static class String extends Stmt {
-   String(Token name, Expr initializer) {
-this.name = name;
-this.initializer = initializer;
-}
+      R visitWhileStmt(While stmt);
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitStringStmt(this);
-}
+      R visitStringStmt(String stmt);
 
-final Token name;
-final Expr initializer;
-}
-static class Int extends Stmt {
-   Int(Token name, Expr initializer) {
-this.name = name;
-this.initializer = initializer;
-}
+      R visitIntStmt(Int stmt);
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitIntStmt(this);
-}
+      R visitFloatStmt(Float stmt);
 
-final Token name;
-final Expr initializer;
-}
-static class Float extends Stmt {
-   Float(Token name, Expr initializer) {
-this.name = name;
-this.initializer = initializer;
-}
+      R visitCharStmt(Char stmt);
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitFloatStmt(this);
-}
+      R visitBoolStmt(Bool stmt);
+   }
 
-final Token name;
-final Expr initializer;
-}
-static class Char extends Stmt {
-   Char(Token name, Expr initializer) {
-this.name = name;
-this.initializer = initializer;
-}
+   static class Block extends Stmt {
+      Block(List<Stmt> statements) {
+         this.statements = statements;
+      }
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitCharStmt(this);
-}
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitBlockStmt(this);
+      }
 
-final Token name;
-final Expr initializer;
-}
-static class Bool extends Stmt {
-   Bool(Token name, Expr initializer) {
-this.name = name;
-this.initializer = initializer;
-}
+      final List<Stmt> statements;
+   }
 
-@Override
-<R> R accept(Visitor<R> visitor) {
-return visitor.visitBoolStmt(this);
-}
+   static class Expression extends Stmt {
+      Expression(Expr expression) {
+         this.expression = expression;
+      }
 
-final Token name;
-final Expr initializer;
-}
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitExpressionStmt(this);
+      }
 
-abstract <R> R accept(Visitor<R> visitor);
+      final Expr expression;
+   }
+
+   static class If extends Stmt {
+      If(Expr condition, List<Stmt> thenBranch, List<Stmt> elseBranch) {
+         this.condition = condition;
+         this.thenBranch = thenBranch;
+         this.elseBranch = elseBranch;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitIfStmt(this);
+      }
+
+      final Expr condition;
+      final List<Stmt> thenBranch;
+      final List<Stmt> elseBranch;
+   }
+
+   static class Print extends Stmt {
+      Print(Expr expression) {
+         this.expression = expression;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitPrintStmt(this);
+      }
+
+      final Expr expression;
+   }
+
+   static class While extends Stmt {
+      While(Expr condition, List<Stmt> body) {
+         this.condition = condition;
+         this.body = body;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitWhileStmt(this);
+      }
+
+      final Expr condition;
+      final List<Stmt> body;
+   }
+
+   static class String extends Stmt {
+      String(Token name, Expr initializer) {
+         this.name = name;
+         this.initializer = initializer;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitStringStmt(this);
+      }
+
+      final Token name;
+      final Expr initializer;
+   }
+
+   static class Int extends Stmt {
+      Int(Token name, Expr initializer) {
+         this.name = name;
+         this.initializer = initializer;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitIntStmt(this);
+      }
+
+      final Token name;
+      final Expr initializer;
+   }
+
+   static class Float extends Stmt {
+      Float(Token name, Expr initializer) {
+         this.name = name;
+         this.initializer = initializer;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitFloatStmt(this);
+      }
+
+      final Token name;
+      final Expr initializer;
+   }
+
+   static class Char extends Stmt {
+      Char(Token name, Expr initializer) {
+         this.name = name;
+         this.initializer = initializer;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitCharStmt(this);
+      }
+
+      final Token name;
+      final Expr initializer;
+   }
+
+   static class Bool extends Stmt {
+      Bool(Token name, Expr initializer) {
+         this.name = name;
+         this.initializer = initializer;
+      }
+
+      @Override
+      <R> R accept(Visitor<R> visitor) {
+         return visitor.visitBoolStmt(this);
+      }
+
+      final Token name;
+      final Expr initializer;
+   }
+
+   abstract <R> R accept(Visitor<R> visitor);
 }

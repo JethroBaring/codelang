@@ -5,13 +5,24 @@ Context Free Grammars for CODE
 ? = optional
 | = or
 
-v0.2
-program -> "BEGIN" "CODE" declaration* statement* "END" "CODE" EOF 
-declaration -> varDeclaration
-varDeclaration -> ("STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
-statement -> exprStmt | printStmt | block
-block -> ( "IF" | "WHILE" ) expression blockContent
-blockContent -> statement*
+program -> "BEGIN" "CODE" varDeclaration* statement* "END" "CODE" EOF 
+varDeclaration -> ( "STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
+statement -> exprStmt | printStmt | block | ifStmt | whileStmt
+ifStmt -> "IF" "(" expression ")" 
+          "BEGIN" "IF" 
+           statements* 
+          "END" "IF"
+          ("ELSE"
+          "BEGIN" "IF" 
+           statements* 
+          "END" "IF"
+          )?
+whileStmt -> "WHILE" "(" expression ")" 
+             "BEGIN" "WHILE" 
+              statements* 
+             "END" "WHILE"
+block -> ( "IF" | "ELSE" | "WHILE" ) "(" expression ")" blockContent
+blockContent -> "BEGIN" ( "IF" | "WHILE" ) statement* "END" ( "IF" | "WHILE" )
 exprStmt -> expression
 printStmt -> "print" expression
 
@@ -23,19 +34,13 @@ binary -> expression operator expression
 operator -> '==' | '!=' | '<' | '>' | '<=' | '>=' | '+' | '-' | '*' | '/'
 
 expression -> assignment
-assignment -> IDENTIFIER "=" assignment | equality
+assignment -> IDENTIFIER "=" assignment | logic_or
+logic_or -> logic_and ( "OR" logic_and )*
+logic_and -> equality ( "AND" equality)*
+
 primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")" | IDENTIFIER
 unary -> ( "!" | "-" ) | primary
 factor -> unary ( ( "/" | "*" ) unary )*
 equality -> comparison ( ( "!=" | "==" ) comparison )*
 comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )*
 term -> factor ( ( "-" | "+" ) factor )*
-
-v0.1
-program -> "BEGIN" "CODE" declaration* "END" "CODE" EOF 
-declaration -> varDeclaration | statement
-varDeclaration -> ("STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
-statement -> exprStmt | printStmt | block
-block -> "BEGIN" ("IF" | "WHILE" )
-exprStmt -> expression
-printStmt -> "print" expression
