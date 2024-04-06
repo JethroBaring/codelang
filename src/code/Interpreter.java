@@ -269,27 +269,27 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof String) {
-                environment.define(stmt.name.lexeme, value);
+                environment.define(stmt.name.lexeme, value, TokenType.STRING, true);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type String.");
             }
         }
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, value, TokenType.STRING, true);
         return null;
     }
 
     @Override
     public Object visitIntStmt(Int stmt) {
-        Object value = null;
+        Object value = 0;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Integer) {
-                environment.define(stmt.name.lexeme, value);
+                environment.define(stmt.name.lexeme, value, TokenType.INT, true);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Integer.");
             }
         }
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, value, TokenType.INT, true);
         return null;
     }
 
@@ -299,12 +299,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Double) {
-                environment.define(stmt.name.lexeme, value);
+                environment.define(stmt.name.lexeme, value, TokenType.FLOAT, true);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
             }
         }
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, value, TokenType.FLOAT, true);
         return null;
     }
 
@@ -314,12 +314,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Character) {
-                environment.define(stmt.name.lexeme, value);
+                environment.define(stmt.name.lexeme, value, TokenType.CHAR, true);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Character.");
             }
         }
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, value, TokenType.CHAR, true);
         return null;
     }
 
@@ -329,12 +329,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Boolean) {
-                environment.define(stmt.name.lexeme, value);
+                environment.define(stmt.name.lexeme, value, TokenType.BOOL, true);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Boolean.");
             }
         }
-        environment.define(stmt.name.lexeme, value);
+        environment.define(stmt.name.lexeme, value, TokenType.BOOL, true);
         return null;
     }
 
@@ -363,12 +363,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
             for (Stmt statement : stmt.thenBranch) {
                 execute(statement);
             }
-        } else if (stmt.elseBranch != null) {
-            for (Stmt statement : stmt.elseBranch) {
-                execute(statement);
+        } else {
+            for (int i = 0; i < stmt.elseIfBranches.size(); i++) {
+                if (isTruthy(evaluate(stmt.elseIfConditions.get(i)))) {
+                    for (Stmt statement : stmt.elseIfBranches.get(i)) {
+                        execute(statement);
+                        return null;
+                    }
+                }
+            }
+
+            if (stmt.elseBranch != null) {
+                for (Stmt statement : stmt.elseBranch) {
+                    execute(statement);
+                }
             }
         }
-
         return null;
     }
 
@@ -413,10 +423,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
         int current = 0;
         int current2 = 0;
-        while(current2 < stmt.identifiers.size()) {
+        while (current2 < stmt.identifiers.size()) {
             Object value = tokens.get(current).literal;
             environment.assign(stmt.identifiers.get(current2), value);
-            current+=2;
+            current += 2;
             current2++;
         }
         return null;

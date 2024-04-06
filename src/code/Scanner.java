@@ -126,6 +126,8 @@ public class Scanner {
       case '<':
         if (match('=')) {
           addToken(TokenType.LESS_THAN_EQUAL);
+        } else if (match('>')) {
+          addToken(TokenType.NOT_EQUAL);
         } else {
           addToken(TokenType.LESS_THAN);
         }

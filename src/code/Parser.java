@@ -27,7 +27,7 @@ public class Parser {
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
         while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
-            statements.add(varDeclaration());
+            statements.addAll(varDeclaration());
         }
 
         while (!isAtEnd() && !check(TokenType.END)) {
@@ -151,6 +151,30 @@ public class Parser {
         consume(TokenType.END, "Expecting END after a statement.");
         consume(TokenType.IF, "Expecting IF after END");
 
+        List<Expr> elseIfConditions = new ArrayList<>();
+
+        List<List<Stmt>> elseIfBranches = new ArrayList<>();
+
+        while (peek().type == TokenType.ELSE && peekNext().type == TokenType.IF && !isAtEnd()) {
+            consume(TokenType.ELSE, "Expect ELSE.");
+            consume(TokenType.IF, "Expecti IF.");
+            consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
+            Expr elseIfCondition = expression();
+            elseIfConditions.add(elseIfCondition);
+            consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
+            consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
+            consume(TokenType.IF, "Expecting an IF after BEGIN");
+
+            List<Stmt> elseIfBranch = new ArrayList<>();
+            while (!isAtEnd() && !check(TokenType.END)) {
+                elseIfBranch.add(statement());
+            }
+
+            elseIfBranches.add(elseIfBranch);
+            consume(TokenType.END, "Expecting END after a statement.");
+            consume(TokenType.IF, "Expecting IF after END");
+        }
+
         List<Stmt> elseBranch = null;
 
         if (match(TokenType.ELSE)) {
@@ -167,7 +191,7 @@ public class Parser {
 
         }
 
-        return new Stmt.If(condition, thenBranch, elseBranch);
+        return new Stmt.If(condition, thenBranch, elseIfConditions, elseIfBranches, elseBranch);
 
     }
 
@@ -191,27 +215,57 @@ public class Parser {
 
     }
 
-    private Stmt varDeclaration() {
+    private List<Stmt> varDeclaration() {
         Token token = previous();
-        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
-        Expr initializer = null;
+        List<Token> names = new ArrayList<>();
+        List<Expr> initializers = new ArrayList<>();
 
-        if (match(TokenType.EQUAL)) {
-            initializer = expression();
-        }
+        do {
+            Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+            names.add(name);
+            Expr initializer = null;
+            if (match(TokenType.EQUAL)) {
+                initializer = expression();
+            }
+
+            initializers.add(initializer);
+        } while (match(TokenType.COMMA));
+
+        List<Stmt> statements = new ArrayList<>();
 
         switch (token.type) {
             case STRING:
-                return new Stmt.String(name, initializer);
+                for (int i = 0; i < names.size(); i++) {
+                    Stmt statement = new Stmt.String(names.get(i), initializers.get(i));
+                    statements.add(statement);
+                }
+                break;
             case CHAR:
-                return new Stmt.Char(name, initializer);
+                for (int i = 0; i < names.size(); i++) {
+                    Stmt statement = new Stmt.Char(names.get(i), initializers.get(i));
+                    statements.add(statement);
+                }
+                break;
             case INT:
-                return new Stmt.Int(name, initializer);
+                for (int i = 0; i < names.size(); i++) {
+                    Stmt statement = new Stmt.Int(names.get(i), initializers.get(i));
+                    statements.add(statement);
+                }
+                break;
             case FLOAT:
-                return new Stmt.Float(name, initializer);
+                for (int i = 0; i < names.size(); i++) {
+                    Stmt statement = new Stmt.Float(names.get(i), initializers.get(i));
+                    statements.add(statement);
+                }
+                break;
             default:
-                return new Stmt.Bool(name, initializer);
+                for (int i = 0; i < names.size(); i++) {
+                    Stmt statement = new Stmt.Bool(names.get(i), initializers.get(i));
+                    statements.add(statement);
+                }
+                break;
         }
+        return statements;
     }
 
     private Stmt expressionStatement() {
@@ -382,6 +436,10 @@ public class Parser {
 
     private Token peek() {
         return tokens.get(current);
+    }
+
+    private Token peekNext() {
+        return tokens.get(current + 1);
     }
 
     private Token advance() {

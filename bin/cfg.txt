@@ -8,9 +8,13 @@ Context Free Grammars for CODE
 program -> funcDeclaration* "BEGIN" "CODE" varDeclaration* statement* "END" "CODE" EOF 
 funcDeclaration -> "FN" function
 function -> IDENTIFIER "(" parameters? ")"
-parameters -> ( "STRING" "CHAR" | "INT" | "FLOAT" | "BOOL" ) IDENTIFIER ( "," ( "STRING" "CHAR" | "INT" | "FLOAT" | "BOOL" ) IDENTIFIER )*
+parameters -> type IDENTIFIER ( "," type IDENTIFIER )*
 
-varDeclaration -> ( "STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT" ) IDENTIFIER ("=" expression)?
+type identifier = expression, identifier,
+
+varDeclaration -> type IDENTIFIER ( "=" expression)? (( "," IDENTIFIER )* ( "=" expression)?)*
+
+type -> "STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT"
 statement -> exprStmt | printStmt | block | ifStmt | whileStmt | scanStmt
 ifStmt -> "IF" "(" expression ")" 
           "BEGIN" "IF" 
@@ -49,7 +53,7 @@ assignment -> IDENTIFIER "=" assignment | logic_or
 logic_or -> logic_and ( "OR" logic_and )*
 logic_and -> equality ( "AND" equality)*
 
-primary -> STRING_LITERAL | FLOAT_LITERAL | CHAR_LITERAL | TRUE_LITERAL | FALSE_LITERAL | "null" | "(" expression ")" | IDENTIFIER
+primary -> literal | "null" | "(" expression ")" | IDENTIFIER
 unary -> ( "!" | "-" ) | primary
 factor -> unary ( ( "/" | "*" ) unary )*
 equality -> comparison ( ( "!=" | "==" ) comparison )*
