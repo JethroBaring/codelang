@@ -15,11 +15,13 @@ public class Environment {
     }
 
     void define(String name, Object value, TokenType type, boolean isImmutable) {
-        if (values.containsKey(name)) {
-
-        } else {
+        if (!values.containsKey(name)) {
             values.put(name, new Variable(type, value, isImmutable));
         }
+    }
+
+    void define(String name, Object value) {
+        values.put(name, new Variable(null, value, true));
     }
 
     Object get(Token name) {
@@ -38,8 +40,8 @@ public class Environment {
             return values.get(name.lexeme).getType();
         }
 
-        if (enclosing != null)
-            return enclosing.getType(name);
+        // if (enclosing != null)
+        //     return enclosing.getType(name);
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
@@ -49,8 +51,8 @@ public class Environment {
             return values.get(name.lexeme).isMutable();
         }
 
-        if (enclosing != null)
-            return enclosing.getMutability(name);
+        // if (enclosing != null)
+        //     return enclosing.getMutability(name);
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
@@ -59,7 +61,6 @@ public class Environment {
     void assign(Token name, Object value) {
         TokenType type = getType(name);
         boolean mutable = getMutability(name);
-
         if (mutable) {
             switch (type) {
                 case STRING:
@@ -72,7 +73,7 @@ public class Environment {
                     }
                 case CHAR:
                     if (value instanceof Character) {
-                        values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
+                        values.put(name.lexeme, new Variable(TokenType.CHAR, value, mutable));
                         return;
                     } else {
                         throw new RuntimeError(name,
@@ -80,7 +81,7 @@ public class Environment {
                     }
                 case INT:
                     if (value instanceof Integer) {
-                        values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
+                        values.put(name.lexeme, new Variable(TokenType.INT, value, mutable));
                         return;
                     } else {
                         throw new RuntimeError(name,
@@ -88,7 +89,7 @@ public class Environment {
                     }
                 case FLOAT:
                     if (value instanceof Double) {
-                        values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
+                        values.put(name.lexeme, new Variable(TokenType.FLOAT, value, mutable));
                         return;
                     } else {
                         throw new RuntimeError(name,
@@ -96,7 +97,7 @@ public class Environment {
                     }
                 case BOOL:
                     if (value instanceof Boolean) {
-                        values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
+                        values.put(name.lexeme, new Variable(TokenType.BOOL, value, mutable));
                         return;
                     } else {
                         throw new RuntimeError(name,

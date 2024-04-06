@@ -108,6 +108,7 @@ abstract class Stmt {
    }
 
    static class Scan extends Stmt {
+
       Scan(List<Token> identifiers) {
          this.identifiers = identifiers;
       }
@@ -117,7 +118,8 @@ abstract class Stmt {
          return visitor.visitScanStmt(this);
       }
 
-      final List<Token> identifiers;
+      List<Token> identifiers;
+
    }
 
    static class While extends Stmt {

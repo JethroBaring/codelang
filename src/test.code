@@ -1,6 +1,26 @@
-BEGIN CODE
+FN test(INT y)
+BEGIN FN
 
-STRING a = "test"
-IMMUT INT x = 5
-DISPLAY: x
+    DISPLAY: clock()
+
+END FN
+
+FN test2(INT y)
+BEGIN FN
+
+    DISPLAY: clock()
+
+END FN
+FN test3(INT y)
+BEGIN FN
+
+    DISPLAY: clock()
+
+END FN
+
+BEGIN CODE
+    test(5)
+    test2(5)
+    test3(5)
 END CODE
+

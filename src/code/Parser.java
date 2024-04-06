@@ -20,7 +20,7 @@ public class Parser {
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         while (match(TokenType.FUNCTION) && !isAtEnd()) {
-            function("function");
+            statements.add(function("function"));
         }
 
         consume(TokenType.BEGIN, "Expecting BEGIN.");
@@ -86,20 +86,6 @@ public class Parser {
         return expr;
     }
 
-    // private Stmt declaration() {
-    // try {
-    // if (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT,
-    // TokenType.BOOL)) {
-    // return varDeclaration();
-    // }
-
-    // return statement();
-    // } catch (ParseError error) {
-    // synchronize();
-    // return null;
-    // }
-    // }
-
     private Stmt statement() {
         if (match(TokenType.DISPLAY)) {
             consume(TokenType.COLON, "Expecting ':' after DISPLAY");
@@ -122,7 +108,6 @@ public class Parser {
 
     private Stmt displayStatement() {
         Expr value = expression();
-        // consume(TokenType.SEMICOLON, "Expect ';' after value");
         return new Stmt.Print(value);
     }
 
@@ -217,8 +202,6 @@ public class Parser {
     }
 
     private List<Stmt> varDeclaration() {
-        // IMMUT INT
-        // INT
         Token immut = previous();
         Token token = previous();
         boolean mutable = true;
@@ -280,7 +263,6 @@ public class Parser {
 
     private Stmt expressionStatement() {
         Expr expr = expression();
-        // consume(TokenType.SEMICOLON, "Expect ';' after expression");
         return new Stmt.Expression(expr);
     }
 
@@ -295,8 +277,8 @@ public class Parser {
                     error(peek(), "Can't have more than 255 parameters.");
                 }
 
-                Token type = consume(advance().type, "Expect parameter type.");
-                Token paramName = consume(advance().type, "Expect parameter name.");
+                Token type = advance();
+                Token paramName = advance();
                 parameters.add(new Parameter(type, paramName));
 
             } while (match(TokenType.COMMA));
@@ -308,13 +290,18 @@ public class Parser {
         consume(TokenType.FUNCTION, "Expect 'FN' before " + kind + " body.");
 
         List<Stmt> body = block(TokenType.FUNCTION);
-
         return new Stmt.Function(name, parameters, body);
     }
 
     private List<Stmt> block(TokenType type) {
 
         List<Stmt> statements = new ArrayList<>();
+
+        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL,
+                TokenType.IMMUTABLE)) {
+            statements.addAll(varDeclaration());
+        }
+
         while (!isAtEnd() && !check(TokenType.END)) {
             statements.add(statement());
         }
@@ -379,7 +366,34 @@ public class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+        return call();
+    }
+
+    private Expr call() {
+        Expr expr = primary();
+
+        if (match(TokenType.LEFT_PARENTHESIS)) {
+            expr = finishCall(expr);
+        }
+
+        return expr;
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(TokenType.RIGHT_PARENTHESIS)) {
+            do {
+                if (arguments.size() >= 255) {
+                    error(peek(), "Can't have more than 255 arguments");
+                }
+                Expr expr = expression();
+                arguments.add(expr);
+            } while (match(TokenType.COMMA));
+        }
+
+        Token rightParen = consume(TokenType.RIGHT_PARENTHESIS, "Expecting a parenthesis after a function call.");
+
+        return new Expr.Call(callee, rightParen, arguments);
     }
 
     private Expr primary() {
@@ -415,6 +429,7 @@ public class Parser {
         return new ParseError();
     }
 
+    @SuppressWarnings("unused")
     private void synchronize() {
         advance();
 

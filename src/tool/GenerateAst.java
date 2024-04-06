@@ -16,19 +16,22 @@ public class GenerateAst {
         defineAst(outputDir, "Expr",
                 Arrays.asList("Assign: Token name, Expr value", "Binary: Expr left, Token operator, Expr right",
                         "Call: Expr callee, Token paren, List<Expr> arguments",
-                        "Grouping : Expr expression", "Literal: Object value", "Logical: Expr left, Token operator, Expr right", "Unary: Token operator, Expr right",
+                        "Grouping : Expr expression", "Literal: Object value",
+                        "Logical: Expr left, Token operator, Expr right", "Unary: Token operator, Expr right",
                         "Variable: Token name"));
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Block: List<Stmt> statements",
                 "Expression : Expr expression",
                 "Function: Token name, List<Parameter> params, List<Stmt> body",
-                "If: Expr condition, List<Stmt> thenBranch, List<Stmt> elseBranch",
+                "If: Expr condition, List<Stmt> thenBranch, List<Expr> elseIfConditions, List<List<Stmt>> elseIfBranches, List<Stmt> elseBranch",
                 "Print: Expr expression",
+                "Scan: List<Token> identifiers",
                 "While: Expr condition, List<Stmt> body",
-                "String: Token name, Expr initializer",
-                "Int: Token name, Expr initializer",
-                "Float: Token name, Expr initializer",
-                "Char: Token name, Expr initializer", "Bool: Token name, Expr initializer"));
+                "String: Token name, Expr initializer, boolean mutable",
+                "Int: Token name, Expr initializer, boolean mutable",
+                "Float: Token name, Expr initializer, boolean mutable",
+                "Char: Token name, Expr initializer, boolean mutable",
+                "Bool: Token name, Expr initializer, boolean mutable"));
     }
 
     private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {

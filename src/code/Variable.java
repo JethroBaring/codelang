@@ -35,4 +35,9 @@ public class Variable {
     public void setImmutable(boolean immutable) {
         mutable = immutable;
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }

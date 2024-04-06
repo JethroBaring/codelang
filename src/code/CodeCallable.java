@@ -2,10 +2,7 @@ package code;
 
 import java.util.List;
 
-/**
- * CodeCallable
- */
-
 public interface CodeCallable {
+    int arity();
     Object call(Interpreter interpreter, List<Object> arguments);
 }

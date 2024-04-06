@@ -22,7 +22,6 @@ public class Code {
         } else {
             runPrompt();
         }
-        char x = 't';
     }
 
     private static void runFile(String path) throws IOException {

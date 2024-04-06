@@ -1,6 +1,10 @@
+modern
+
 BEGIN CODE
 
-STRING a = "test"
-IMMUT INT x = 5
-DISPLAY: x
+IMMUT STRING a = "test"
+INT x = 5
+a = 5
+DISPLAY: typeof x
+
 END CODE
