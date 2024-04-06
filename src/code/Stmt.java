@@ -138,9 +138,10 @@ abstract class Stmt {
    }
 
    static class String extends Stmt {
-      String(Token name, Expr initializer) {
+      String(Token name, Expr initializer, boolean mutable) {
          this.name = name;
          this.initializer = initializer;
+         this.mutable = mutable;
       }
 
       @Override
@@ -150,12 +151,14 @@ abstract class Stmt {
 
       final Token name;
       final Expr initializer;
+      final boolean mutable;
    }
 
    static class Int extends Stmt {
-      Int(Token name, Expr initializer) {
+      Int(Token name, Expr initializer, boolean mutable) {
          this.name = name;
          this.initializer = initializer;
+         this.mutable = mutable;
       }
 
       @Override
@@ -165,12 +168,14 @@ abstract class Stmt {
 
       final Token name;
       final Expr initializer;
+      final boolean mutable;
    }
 
    static class Float extends Stmt {
-      Float(Token name, Expr initializer) {
+      Float(Token name, Expr initializer, boolean mutable) {
          this.name = name;
          this.initializer = initializer;
+         this.mutable = mutable;
       }
 
       @Override
@@ -180,12 +185,14 @@ abstract class Stmt {
 
       final Token name;
       final Expr initializer;
+      final boolean mutable;
    }
 
    static class Char extends Stmt {
-      Char(Token name, Expr initializer) {
+      Char(Token name, Expr initializer, boolean mutable) {
          this.name = name;
          this.initializer = initializer;
+         this.mutable = mutable;
       }
 
       @Override
@@ -195,12 +202,14 @@ abstract class Stmt {
 
       final Token name;
       final Expr initializer;
+      final boolean mutable;
    }
 
    static class Bool extends Stmt {
-      Bool(Token name, Expr initializer) {
+      Bool(Token name, Expr initializer, boolean mutable) {
          this.name = name;
          this.initializer = initializer;
+         this.mutable = mutable;
       }
 
       @Override
@@ -210,6 +219,7 @@ abstract class Stmt {
 
       final Token name;
       final Expr initializer;
+      final boolean mutable;
    }
 
    abstract <R> R accept(Visitor<R> visitor);

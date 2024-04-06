@@ -26,7 +26,8 @@ public class Parser {
         consume(TokenType.BEGIN, "Expecting BEGIN.");
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
-        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL, TokenType.IMMUTABLE)) {
+        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL,
+                TokenType.IMMUTABLE)) {
             statements.addAll(varDeclaration());
         }
 
@@ -216,13 +217,17 @@ public class Parser {
     }
 
     private List<Stmt> varDeclaration() {
+        // IMMUT INT
+        // INT
+        Token immut = previous();
         Token token = previous();
-        boolean immutable = false;
+        boolean mutable = true;
         List<Token> names = new ArrayList<>();
         List<Expr> initializers = new ArrayList<>();
 
-        if(token.type == TokenType.IMMUTABLE) {
-            immutable = true;
+        if (immut.type == TokenType.IMMUTABLE) {
+            mutable = false;
+            token = consume(peek().type, "Expecting a variable type after 'IMMUT' keyword.");
         }
 
         do {
@@ -241,31 +246,31 @@ public class Parser {
         switch (token.type) {
             case STRING:
                 for (int i = 0; i < names.size(); i++) {
-                    Stmt statement = new Stmt.String(names.get(i), initializers.get(i));
+                    Stmt statement = new Stmt.String(names.get(i), initializers.get(i), mutable);
                     statements.add(statement);
                 }
                 break;
             case CHAR:
                 for (int i = 0; i < names.size(); i++) {
-                    Stmt statement = new Stmt.Char(names.get(i), initializers.get(i));
+                    Stmt statement = new Stmt.Char(names.get(i), initializers.get(i), mutable);
                     statements.add(statement);
                 }
                 break;
             case INT:
                 for (int i = 0; i < names.size(); i++) {
-                    Stmt statement = new Stmt.Int(names.get(i), initializers.get(i));
+                    Stmt statement = new Stmt.Int(names.get(i), initializers.get(i), mutable);
                     statements.add(statement);
                 }
                 break;
             case FLOAT:
                 for (int i = 0; i < names.size(); i++) {
-                    Stmt statement = new Stmt.Float(names.get(i), initializers.get(i));
+                    Stmt statement = new Stmt.Float(names.get(i), initializers.get(i), mutable);
                     statements.add(statement);
                 }
                 break;
             default:
                 for (int i = 0; i < names.size(); i++) {
-                    Stmt statement = new Stmt.Bool(names.get(i), initializers.get(i));
+                    Stmt statement = new Stmt.Bool(names.get(i), initializers.get(i), mutable);
                     statements.add(statement);
                 }
                 break;

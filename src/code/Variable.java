@@ -3,12 +3,12 @@ package code;
 public class Variable {
     private TokenType type;
     private Object value;
-    private boolean isImmutable;
+    private boolean mutable;
 
-    public Variable(TokenType type, Object value, boolean isImmutable) {
+    public Variable(TokenType type, Object value, boolean mutable) {
         this.type = type;
         this.value = value;
-        this.isImmutable = isImmutable;
+        this.mutable = mutable;
     }
 
     // Getters and setters
@@ -28,11 +28,11 @@ public class Variable {
         this.value = value;
     }
 
-    public boolean isImmutable() {
-        return isImmutable;
+    public boolean isMutable() {
+        return mutable;
     }
 
     public void setImmutable(boolean immutable) {
-        isImmutable = immutable;
+        mutable = immutable;
     }
 }

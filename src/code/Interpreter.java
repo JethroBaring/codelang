@@ -273,12 +273,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof String) {
-                environment.define(stmt.name.lexeme, value, TokenType.STRING, true);
+                environment.define(stmt.name.lexeme, value, TokenType.STRING, stmt.mutable);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type String.");
             }
         }
-        environment.define(stmt.name.lexeme, value, TokenType.STRING, true);
+        environment.define(stmt.name.lexeme, value, TokenType.STRING, stmt.mutable);
         return null;
     }
 
@@ -288,12 +288,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Integer) {
-                environment.define(stmt.name.lexeme, value, TokenType.INT, true);
+                environment.define(stmt.name.lexeme, value, TokenType.INT, stmt.mutable);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Integer.");
             }
         }
-        environment.define(stmt.name.lexeme, value, TokenType.INT, true);
+        environment.define(stmt.name.lexeme, value, TokenType.INT, stmt.mutable);
         return null;
     }
 
@@ -303,12 +303,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Double) {
-                environment.define(stmt.name.lexeme, value, TokenType.FLOAT, true);
+                environment.define(stmt.name.lexeme, value, TokenType.FLOAT, stmt.mutable);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
             }
         }
-        environment.define(stmt.name.lexeme, value, TokenType.FLOAT, true);
+        environment.define(stmt.name.lexeme, value, TokenType.FLOAT, stmt.mutable);
         return null;
     }
 
@@ -318,12 +318,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Character) {
-                environment.define(stmt.name.lexeme, value, TokenType.CHAR, true);
+                environment.define(stmt.name.lexeme, value, TokenType.CHAR, stmt.mutable);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Character.");
             }
         }
-        environment.define(stmt.name.lexeme, value, TokenType.CHAR, true);
+        environment.define(stmt.name.lexeme, value, TokenType.CHAR, stmt.mutable);
         return null;
     }
 
@@ -333,12 +333,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (value instanceof Boolean) {
-                environment.define(stmt.name.lexeme, value, TokenType.BOOL, true);
+                environment.define(stmt.name.lexeme, value, TokenType.BOOL, stmt.mutable);
             } else {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Boolean.");
             }
         }
-        environment.define(stmt.name.lexeme, value, TokenType.BOOL, true);
+        environment.define(stmt.name.lexeme, value, TokenType.BOOL, stmt.mutable);
         return null;
     }
 
