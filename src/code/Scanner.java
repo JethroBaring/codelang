@@ -34,7 +34,7 @@ public class Scanner {
     keywords.put("OR", TokenType.OR);
     keywords.put("NOT", TokenType.NOT);
     keywords.put("FN", TokenType.FUNCTION);
-
+    keywords.put("IMMUT", TokenType.IMMUTABLE);
   }
 
   Scanner(String source) {

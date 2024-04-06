@@ -26,7 +26,7 @@ public class Parser {
         consume(TokenType.BEGIN, "Expecting BEGIN.");
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
-        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
+        while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL, TokenType.IMMUTABLE)) {
             statements.addAll(varDeclaration());
         }
 
@@ -217,8 +217,13 @@ public class Parser {
 
     private List<Stmt> varDeclaration() {
         Token token = previous();
+        boolean immutable = false;
         List<Token> names = new ArrayList<>();
         List<Expr> initializers = new ArrayList<>();
+
+        if(token.type == TokenType.IMMUTABLE) {
+            immutable = true;
+        }
 
         do {
             Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");

@@ -254,12 +254,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
+        if (value instanceof Boolean) {
+            System.out.println(value.toString().toUpperCase());
+        } else {
+            System.out.println(stringify(value));
+        }
         // if ((boolean) value == true || (boolean) value == false) {
         // System.out.println(stringify(value).toUpperCase());
         // } else {
         // System.out.println(stringify(value));
         // }
-        System.out.println(stringify(value));
         return null;
     }
 

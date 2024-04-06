@@ -12,7 +12,7 @@ parameters -> type IDENTIFIER ( "," type IDENTIFIER )*
 
 type identifier = expression, identifier,
 
-varDeclaration -> type IDENTIFIER ( "=" expression)? (( "," IDENTIFIER )* ( "=" expression)?)*
+varDeclaration -> "IMMUT"? type IDENTIFIER ( "=" expression)? (( "," IDENTIFIER )* ( "=" expression)?)*
 
 type -> "STRING" | "INT" | "CHAR" | "BOOL" | "FLOAT"
 statement -> exprStmt | printStmt | block | ifStmt | whileStmt | scanStmt

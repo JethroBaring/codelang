@@ -58,6 +58,7 @@ enum TokenType {
     OR,
     FUNCTION,
     ELSE_IF,
+    IMMUTABLE,
 
     EOF,
 }
