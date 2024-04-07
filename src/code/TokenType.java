@@ -59,6 +59,7 @@ enum TokenType {
     FUNCTION,
     ELSE_IF,
     IMMUTABLE,
+    RETURN,
 
     EOF,
 }

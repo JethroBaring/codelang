@@ -20,6 +20,7 @@ import code.Stmt.Function;
 import code.Stmt.If;
 import code.Stmt.Int;
 import code.Stmt.Print;
+import code.Stmt.Return;
 import code.Stmt.Scan;
 import code.Stmt.While;
 import java.util.Scanner;
@@ -495,5 +496,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
 
         return function.call(this, arguments);
+    }
+
+    @Override
+    public Object visitReturnStmt(Return stmt) {
+        Object value = null;
+        if(stmt.value != null) value = evaluate(stmt.value);
+
+        throw new code.Return(value);
     }
 }

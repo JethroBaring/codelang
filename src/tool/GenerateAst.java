@@ -25,6 +25,7 @@ public class GenerateAst {
                 "Function: Token name, List<Parameter> params, List<Stmt> body",
                 "If: Expr condition, List<Stmt> thenBranch, List<Expr> elseIfConditions, List<List<Stmt>> elseIfBranches, List<Stmt> elseBranch",
                 "Print: Expr expression",
+                "Return: Token keyword, Expr value",
                 "Scan: List<Token> identifiers",
                 "While: Expr condition, List<Stmt> body",
                 "String: Token name, Expr initializer, boolean mutable",

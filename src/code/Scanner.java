@@ -35,6 +35,7 @@ public class Scanner {
     keywords.put("NOT", TokenType.NOT);
     keywords.put("FN", TokenType.FUNCTION);
     keywords.put("IMMUT", TokenType.IMMUTABLE);
+    keywords.put("RETURN", TokenType.RETURN);
   }
 
   Scanner(String source) {

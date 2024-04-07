@@ -1,26 +1,7 @@
-FN test(INT y)
-BEGIN FN
-
-    DISPLAY: clock()
-
-END FN
-
-FN test2(INT y)
-BEGIN FN
-
-    DISPLAY: clock()
-
-END FN
-FN test3(INT y)
-BEGIN FN
-
-    DISPLAY: clock()
-
-END FN
+IMPORT [SCANNER]
 
 BEGIN CODE
-    test(5)
-    test2(5)
-    test3(5)
+    STRING age = scanString("Enter your age: ")
+    DISPLAY: age
 END CODE
 

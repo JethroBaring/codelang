@@ -1,10 +1,7 @@
-modern
+IMPORT [SCANNER]
 
 BEGIN CODE
-
-IMMUT STRING a = "test"
-INT x = 5
-a = 5
-DISPLAY: typeof x
-
+    STRING age = scanString("Enter your age: ")
+    DISPLAY: age
 END CODE
+

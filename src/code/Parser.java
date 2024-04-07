@@ -97,6 +97,10 @@ public class Parser {
             return scanStatement();
         }
 
+        if(match(TokenType.RETURN)) {
+            return returnStatement();
+        }
+
         if (match(TokenType.IF)) {
             return ifStatement();
         } else if (match(TokenType.WHILE)) {
@@ -109,6 +113,17 @@ public class Parser {
     private Stmt displayStatement() {
         Expr value = expression();
         return new Stmt.Print(value);
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+
+        if(!check(TokenType.END)) {
+            value = expression();
+        }
+        
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt scanStatement() {

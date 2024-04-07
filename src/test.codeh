@@ -1,23 +1,59 @@
-BEGIN HEADER STDLIB
+FN scanString(STRING message)
+BEGIN FN
 
-    FN CALL(STRING x, STRING y)
-    BEGIN FN
+    STRING x
 
-    END FN
+    DISPLAY: message
+    SCAN: x
 
-    FN CALL(STRING x, STRING y)
-    BEGIN FN
-        
-    END FN
 
-    FN CALL(STRING x, STRING y)
-    BEGIN FN
-        
-    END FN
+    RETURN x
+END FN
 
-    FN CALL(STRING x, STRING y)
-    BEGIN FN
-        
-    END FN
+FN scanChar(STRING message)
+BEGIN FN
 
-END HEADER
+    CHAR x
+
+    DISPLAY: message
+    SCAN: x
+
+
+    RETURN x
+END FN
+
+FN scanInt(STRING message)
+BEGIN FN
+
+    INT x
+
+    DISPLAY: message
+    SCAN: x
+
+
+    RETURN x
+END FN
+
+FN scanFloat(STRING message)
+BEGIN FN
+
+    INT x
+
+    DISPLAY: message
+    SCAN: x
+
+
+    RETURN x
+END FN
+
+FN scanBoolean(STRING message)
+BEGIN FN
+
+    BOOL x
+
+    DISPLAY: message
+    SCAN: x
+
+
+    RETURN x
+END FN
