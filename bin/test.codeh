@@ -1,59 +1,8 @@
-FN scanString(STRING message)
-BEGIN FN
+jujutsu () {
+    gojou y = 5
+    itadori x = "test"
+}
 
-    STRING x
+curse name () {
 
-    DISPLAY: message
-    SCAN: x
-
-
-    RETURN x
-END FN
-
-FN scanChar(STRING message)
-BEGIN FN
-
-    CHAR x
-
-    DISPLAY: message
-    SCAN: x
-
-
-    RETURN x
-END FN
-
-FN scanInt(STRING message)
-BEGIN FN
-
-    INT x
-
-    DISPLAY: message
-    SCAN: x
-
-
-    RETURN x
-END FN
-
-FN scanFloat(STRING message)
-BEGIN FN
-
-    INT x
-
-    DISPLAY: message
-    SCAN: x
-
-
-    RETURN x
-END FN
-
-FN scanBoolean(STRING message)
-BEGIN FN
-
-    BOOL x
-
-    DISPLAY: message
-    SCAN: x
-
-
-    RETURN x
-END FN
+}

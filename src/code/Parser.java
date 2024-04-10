@@ -282,6 +282,11 @@ public class Parser {
     }
 
     private Function function(String kind) {
+        Token returnType = null;
+        if(match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
+            returnType = previous();
+        }
+
         Token name = consume(TokenType.IDENTIFIER, "Expect " + kind + " name.");
         consume(TokenType.LEFT_PARENTHESIS, "Expect '(' after " + kind + " name.");
         List<Parameter> parameters = new ArrayList<>();
@@ -305,7 +310,7 @@ public class Parser {
         consume(TokenType.FUNCTION, "Expect 'FN' before " + kind + " body.");
 
         List<Stmt> body = block(TokenType.FUNCTION);
-        return new Stmt.Function(name, parameters, body);
+        return new Stmt.Function(name, parameters, body, returnType);
     }
 
     private List<Stmt> block(TokenType type) {

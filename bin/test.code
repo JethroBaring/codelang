@@ -1,7 +1,13 @@
-IMPORT [SCANNER]
+FN FLOAT CEIL (FLOAT x)
+BEGIN FN
+    RETURN x + y
+END FN
 
 BEGIN CODE
-    STRING age = scanString("Enter your age: ")
-    DISPLAY: age
+    ARRAY <STRING> x = [1]
+    x[0] = 5
+    
+    FLOAT x = 12.12
+    DISPLAY: sqrt((FLOAT) 25)
 END CODE
 

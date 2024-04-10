@@ -1,11 +1,12 @@
-Context Free Grammars for CODE
+Context Free Grammars for CODE Programming Language
 
 * = zero or more
 + = atleast once
 ? = optional
 | = or
 
-program -> funcDeclaration* "BEGIN" "CODE" varDeclaration* statement* "END" "CODE" EOF 
+program -> import* funcDeclaration* "BEGIN" "CODE" varDeclaration* statement* "END" "CODE" EOF
+import -> "IMPORT" ("["  "]")
 funcDeclaration -> "FN" function
 function -> IDENTIFIER "(" parameters? ")"
 parameters -> type IDENTIFIER ( "," type IDENTIFIER )*

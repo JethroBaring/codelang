@@ -65,6 +65,100 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 return "<native fn>";
             }
         });
+
+        globals.define("floor", new CodeCallable() {
+
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return Math.floor((double) arguments.get(0));
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("sqrt", new CodeCallable() {
+
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return Math.sqrt((double) arguments.get(0));
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("abs", new CodeCallable() {
+
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return Math.abs((double) arguments.get(0));
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("pow", new CodeCallable() {
+
+            @Override
+            public int arity() {
+                return 2;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return Math.pow((double) arguments.get(0), (double)arguments.get(1));
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("scanString", new CodeCallable() {
+
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Scanner scanner = new Scanner(System.in);
+                System.out.println(arguments.get(0));
+                String input = scanner.nextLine();
+                scanner.close();
+                return input;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
     }
 
     void interpret(List<Stmt> statements) {
@@ -86,37 +180,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
             case GREATER_THAN:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    // return formatBoolean((int) left > (int) right);
                     return (int) left > (int) right;
                 } else {
                     return (int) left < (int) right;
-                    // return formatBoolean((double) left > (double) right);
                 }
             case GREATER_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    // return formatBoolean((int) left >= (int) right);
                     return (int) left >= (int) right;
                 } else {
-                    // return formatBoolean((double) left >= (double) right);
                     return (int) left >= (int) right;
                 }
             case LESS_THAN:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    // return formatBoolean((int) left < (int) right);
                     return (int) left < (int) right;
                 } else {
-                    // return formatBoolean((double) left < (double) right);
                     return (int) left < (int) right;
                 }
             case LESS_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
-                    // return formatBoolean((int) left <= (int) right);
                     return (int) left <= (int) right;
                 } else {
-                    // return formatBoolean((double) left <= (double) right);
                     return (int) left <= (int) right;
                 }
             case MINUS:
@@ -296,11 +382,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         } else {
             System.out.println(stringify(value));
         }
-        // if ((boolean) value == true || (boolean) value == false) {
-        // System.out.println(stringify(value).toUpperCase());
-        // } else {
-        // System.out.println(stringify(value));
-        // }
         return null;
     }
 

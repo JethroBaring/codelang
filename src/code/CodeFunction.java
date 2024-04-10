@@ -46,9 +46,53 @@ public class CodeFunction implements CodeCallable {
         try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
-            return returnValue.value;
+            System.out.println(returnValue);
+            if (declaration.returnType != null && returnValue != null) {
+                if (declaration.returnType.type == TokenType.STRING) {
+                    if (returnValue.value instanceof String) {
+                        return returnValue.value;
+                    }
+                    return new RuntimeError(declaration.name, "Return value must be of type String");
+                } else if (declaration.returnType.type == TokenType.CHAR) {
+                    if (returnValue.value instanceof Character) {
+                        return returnValue.value;
+                    }
+                    return new RuntimeError(declaration.name, "Return value must be of type Character");
+
+                } else if (declaration.returnType.type == TokenType.INT) {
+                    if (returnValue.value instanceof Integer) {
+                        return returnValue.value;
+                    }
+                    return new RuntimeError(declaration.name, "Return value must be of type Integer");
+
+                } else if (declaration.returnType.type == TokenType.FLOAT) {
+                    if (returnValue.value instanceof Float) {
+                        return returnValue.value;
+                    }
+                    return new RuntimeError(declaration.name, "Return value must be of type Float");
+
+                } else if (declaration.returnType.type == TokenType.BOOL) {
+                    if (returnValue.value instanceof Boolean) {
+                        return returnValue.value;
+                    }
+                    return new RuntimeError(declaration.name, "Return value must be of type Boolean");
+                }
+            } 
+
+            if(declaration.returnType == null) {
+                if(returnValue.value != null) {
+                    throw new RuntimeError(declaration.name, "Function with void return type shouldn't return anything. ");
+                }
+
+                return null;
+            }
+
         }
-        
+
+        if (declaration.returnType != null) {
+            throw new RuntimeError(declaration.returnType, "Function must return a value of type "
+                    + declaration.returnType.lexeme + " or remove the return type of the function.");
+        }
         return null;
     }
 
