@@ -46,7 +46,6 @@ public class CodeFunction implements CodeCallable {
         try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
-            System.out.println(returnValue);
             if (declaration.returnType != null && returnValue != null) {
                 if (declaration.returnType.type == TokenType.STRING) {
                     if (returnValue.value instanceof String) {

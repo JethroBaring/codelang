@@ -1,13 +1,15 @@
-FN FLOAT CEIL (FLOAT x)
+FN ADD (INT x, INT y)
 BEGIN FN
-    RETURN x + y
+    DISPLAY: "test"
+    
+    RETURN
 END FN
 
 BEGIN CODE
-    ARRAY <STRING> x = [1]
-    x[0] = 5
+        
+    INT x = 2
+    INT y = 3 + 2 / 2 + (2)
+    ADD(x,y)
     
-    FLOAT x = 12.12
-    DISPLAY: sqrt((FLOAT) 25)
 END CODE
 
