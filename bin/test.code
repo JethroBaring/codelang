@@ -1,15 +1,22 @@
-FN ADD (INT x, INT y)
+FN INT ADD (INT x, INT y)
 BEGIN FN
-    DISPLAY: "test"
+    DISPLAY: x & y
     
-    RETURN
+    RETURN x + y
 END FN
 
 BEGIN CODE
         
-    INT x = 2
-    INT y = 3 + 2 / 2 + (2)
-    ADD(x,y)
-    
+    INT a = 100
+
+    IF (a == 101 AND a == 100)
+    BEGIN IF
+        DISPLAY: a
+    END IF
+    ELSE IF(a = 200)
+    BEGIN IF
+        
+    END IF
+    DISPLAY: a
 END CODE
 

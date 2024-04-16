@@ -138,7 +138,7 @@ public class Parser {
 
     private Stmt ifStatement() {
         consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
-        Expr condition = expression();
+        Expr condition = or();
         consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
 
         consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
@@ -160,7 +160,7 @@ public class Parser {
             consume(TokenType.ELSE, "Expect ELSE.");
             consume(TokenType.IF, "Expecti IF.");
             consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
-            Expr elseIfCondition = expression();
+            Expr elseIfCondition = or();
             elseIfConditions.add(elseIfCondition);
             consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
             consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
