@@ -1,22 +1,13 @@
-FN INT ADD (INT x, INT y)
+FN FLOAT test (FLOAT f1)
 BEGIN FN
-    DISPLAY: x & y
-    
-    RETURN x + y
+    RETURN f1
 END FN
-
 BEGIN CODE
-        
-    INT a = 100
+    FLOAT d = 1.123, e
+    INT a = 1
+    CHAR w = 'c'
+    e = test(d)
+    DISPLAY: d == w
 
-    IF (a == 101 AND a == 100)
-    BEGIN IF
-        DISPLAY: a
-    END IF
-    ELSE IF(a = 200)
-    BEGIN IF
-        
-    END IF
-    DISPLAY: a
 END CODE
 

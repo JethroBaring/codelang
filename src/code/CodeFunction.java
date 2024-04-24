@@ -65,7 +65,7 @@ public class CodeFunction implements CodeCallable {
                     return new RuntimeError(declaration.name, "Return value must be of type Integer");
 
                 } else if (declaration.returnType.type == TokenType.FLOAT) {
-                    if (returnValue.value instanceof Float) {
+                    if (returnValue.value instanceof Double) {
                         return returnValue.value;
                     }
                     return new RuntimeError(declaration.name, "Return value must be of type Float");
@@ -76,11 +76,12 @@ public class CodeFunction implements CodeCallable {
                     }
                     return new RuntimeError(declaration.name, "Return value must be of type Boolean");
                 }
-            } 
+            }
 
-            if(declaration.returnType == null) {
-                if(returnValue.value != null) {
-                    throw new RuntimeError(declaration.name, "Function with void return type shouldn't return anything. ");
+            if (declaration.returnType == null) {
+                if (returnValue.value != null) {
+                    throw new RuntimeError(declaration.name,
+                            "Function with void return type shouldn't return anything. ");
                 }
 
                 return null;

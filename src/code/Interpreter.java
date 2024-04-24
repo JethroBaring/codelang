@@ -182,28 +182,28 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left > (int) right;
                 } else {
-                    return (int) left < (int) right;
+                    return (double) left > (double) right;
                 }
             case GREATER_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left >= (int) right;
                 } else {
-                    return (int) left >= (int) right;
+                    return (double) left >= (double) right;
                 }
             case LESS_THAN:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left < (int) right;
                 } else {
-                    return (int) left < (int) right;
+                    return (double) left < (double) right;
                 }
             case LESS_THAN_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left <= (int) right;
                 } else {
-                    return (int) left <= (int) right;
+                    return (double) left <= (double) right;
                 }
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);

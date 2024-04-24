@@ -1,22 +1,19 @@
-FN INT ADD (INT x, INT y)
-BEGIN FN
-    DISPLAY: x & y
-    
-    RETURN x + y
-END FN
 
 BEGIN CODE
-        
-    INT a = 100
-
-    IF (a == 101 AND a == 100)
+    INT num
+    DISPLAY: "Enter a input: "
+    SCAN: num
+    ELSE IF (num % 3 == 0 AND num % 5 == 0)
     BEGIN IF
-        DISPLAY: a
+        DISPLAY: "FizzBuzz" & $
     END IF
-    ELSE IF(a = 200)
+    ELSE IF (num % 3 == 0)
     BEGIN IF
-        
+        DISPLAY: "Fizz" & $
     END IF
-    DISPLAY: a
+    ELSE IF (num % 5 == 0)
+    BEGIN IF
+        DISPLAY: "Buzz" & $
+    END IF
 END CODE
 
