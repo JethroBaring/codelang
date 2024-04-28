@@ -1,19 +1,12 @@
+FN TEST()
+BEGIN FN
+
+DISPLAY: "LOL"
+
+END FN
 
 BEGIN CODE
-    INT num
-    DISPLAY: "Enter a input: "
-    SCAN: num
-    ELSE IF (num % 3 == 0 AND num % 5 == 0)
-    BEGIN IF
-        DISPLAY: "FizzBuzz" & $
-    END IF
-    ELSE IF (num % 3 == 0)
-    BEGIN IF
-        DISPLAY: "Fizz" & $
-    END IF
-    ELSE IF (num % 5 == 0)
-    BEGIN IF
-        DISPLAY: "Buzz" & $
-    END IF
+TEST()
 END CODE
 
+BEGIN CODE

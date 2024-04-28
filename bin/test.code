@@ -1,13 +1,12 @@
-FN FLOAT test (FLOAT f1)
+FN TEST()
 BEGIN FN
-    RETURN f1
-END FN
-BEGIN CODE
-    FLOAT d = 1.123, e
-    INT a = 1
-    CHAR w = 'c'
-    e = test(d)
-    DISPLAY: d == w
 
+DISPLAY: "LOL"
+
+END FN
+
+BEGIN CODE
+TEST()
 END CODE
 
+BEGIN CODE

@@ -38,6 +38,21 @@ public class Parser {
         consume(TokenType.END, "Expecting END.");
         consume(TokenType.CODE, "Expecting 'CODE' after END");
 
+        if (peek().type != TokenType.EOF) {
+            if (peek().type == TokenType.BEGIN && peekNext().type == TokenType.CODE) {
+                throw error(peek(),
+                        "Expecting only one pair of BEGIN CODE and END CODE blocks");
+            } else if (peek().type == TokenType.FUNCTION) {
+                throw error(peek(),
+                        "Function must be declared at the topmost part before BEGIN CODE.");
+
+            } else {
+                throw error(peek(),
+                        "All statements must be inside BEGIN CODE and END CODE.");
+            }
+
+        }
+
         return statements;
     }
 
@@ -97,7 +112,7 @@ public class Parser {
             return scanStatement();
         }
 
-        if(match(TokenType.RETURN)) {
+        if (match(TokenType.RETURN)) {
             return returnStatement();
         }
 
@@ -119,10 +134,10 @@ public class Parser {
         Token keyword = previous();
         Expr value = null;
 
-        if(!check(TokenType.END)) {
+        if (!check(TokenType.END)) {
             value = expression();
         }
-        
+
         return new Stmt.Return(keyword, value);
     }
 
@@ -283,7 +298,7 @@ public class Parser {
 
     private Function function(String kind) {
         Token returnType = null;
-        if(match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
+        if (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL)) {
             returnType = previous();
         }
 
@@ -320,6 +335,10 @@ public class Parser {
         while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL,
                 TokenType.IMMUTABLE)) {
             statements.addAll(varDeclaration());
+        }
+
+        while (match(TokenType.FUNCTION) && !isAtEnd()) {
+            statements.add(function("function"));
         }
 
         while (!isAtEnd() && !check(TokenType.END)) {

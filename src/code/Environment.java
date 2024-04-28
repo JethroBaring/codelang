@@ -17,6 +17,8 @@ public class Environment {
     void define(String name, Object value, TokenType type, boolean isImmutable) {
         if (!values.containsKey(name)) {
             values.put(name, new Variable(type, value, isImmutable));
+        } else {
+            throw new RuntimeError(new Token(type, name, type, 0), "Variable " + name + " is already defined.");
         }
     }
 
@@ -40,8 +42,8 @@ public class Environment {
             return values.get(name.lexeme).getType();
         }
 
-        // if (enclosing != null)
-        //     return enclosing.getType(name);
+        if (enclosing != null)
+            return enclosing.getType(name);
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
@@ -51,8 +53,8 @@ public class Environment {
             return values.get(name.lexeme).isMutable();
         }
 
-        // if (enclosing != null)
-        //     return enclosing.getMutability(name);
+        if (enclosing != null)
+            return enclosing.getMutability(name);
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }

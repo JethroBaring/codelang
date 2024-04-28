@@ -4,9 +4,11 @@ import java.util.List;
 
 public class CodeFunction implements CodeCallable {
     private final Stmt.Function declaration;
+    private final Environment closure;
 
-    CodeFunction(Stmt.Function declaration) {
+    CodeFunction(Stmt.Function declaration, Environment closure) {
         this.declaration = declaration;
+        this.closure = closure;
     }
 
     @Override
@@ -16,7 +18,7 @@ public class CodeFunction implements CodeCallable {
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = closure;
 
         for (int i = 0; i < declaration.params.size(); i++) {
             TokenType type = declaration.params.get(i).type.type;

@@ -29,6 +29,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
+    private Environment functionEnvironment = null;
 
     Interpreter() {
         globals.define("clock", new CodeCallable() {
@@ -129,7 +130,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return Math.pow((double) arguments.get(0), (double)arguments.get(1));
+                return Math.pow((double) arguments.get(0), (double) arguments.get(1));
             }
 
             @Override
@@ -313,11 +314,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Environment previous = this.environment;
         try {
             this.environment = environment;
+            this.functionEnvironment = environment;
             for (Stmt statement : statements) {
                 execute(statement);
             }
         } finally {
             this.environment = previous;
+            this.functionEnvironment = null;
         }
 
     }
@@ -532,7 +535,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitFunctionStmt(Function stmt) {
-        CodeFunction function = new CodeFunction(stmt);
+        CodeFunction function;
+        
+        if(functionEnvironment != null) {
+            function = new CodeFunction(stmt, new Environment(functionEnvironment));
+        } else {
+            function = new CodeFunction(stmt, new Environment());
+        }
+
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -582,7 +592,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Object visitReturnStmt(Return stmt) {
         Object value = null;
-        if(stmt.value != null) value = evaluate(stmt.value);
+        if (stmt.value != null)
+            value = evaluate(stmt.value);
 
         throw new code.Return(value);
     }
