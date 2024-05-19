@@ -24,12 +24,12 @@ import code.Stmt.Return;
 import code.Stmt.Scan;
 import code.Stmt.While;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
-    private Environment functionEnvironment = null;
 
     Interpreter() {
         globals.define("clock", new CodeCallable() {
@@ -245,7 +245,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 }
                 break;
             case AMPERSAND:
-                return left.toString() + right.toString();
+                if (left instanceof Boolean && right instanceof Boolean) {
+                    return left.toString().toUpperCase() + right.toString().toUpperCase();
+                } else if (left instanceof Boolean) {
+                    return left.toString().toUpperCase() + right.toString();
+                } else if (right instanceof Boolean) {
+                    return left.toString() + right.toString().toUpperCase();
+                } else {
+                    return left.toString() + right.toString();
+                }
             case MODULO:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
@@ -314,13 +322,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Environment previous = this.environment;
         try {
             this.environment = environment;
-            this.functionEnvironment = environment;
             for (Stmt statement : statements) {
                 execute(statement);
             }
         } finally {
             this.environment = previous;
-            this.functionEnvironment = null;
         }
 
     }
@@ -393,9 +399,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof String) {
-                environment.define(stmt.name.lexeme, value, TokenType.STRING, stmt.mutable);
-            } else {
+            if (!(value instanceof String)) {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type String.");
             }
         }
@@ -408,9 +412,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof Integer) {
-                environment.define(stmt.name.lexeme, value, TokenType.INT, stmt.mutable);
-            } else {
+            if (!(value instanceof Integer)) {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Integer.");
             }
         }
@@ -423,9 +425,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof Double) {
-                environment.define(stmt.name.lexeme, value, TokenType.FLOAT, stmt.mutable);
-            } else {
+            if (!(value instanceof Double)) {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
             }
         }
@@ -438,9 +438,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof Character) {
-                environment.define(stmt.name.lexeme, value, TokenType.CHAR, stmt.mutable);
-            } else {
+            if (!(value instanceof Character)) {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Character.");
             }
         }
@@ -453,9 +451,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
-            if (value instanceof Boolean) {
-                environment.define(stmt.name.lexeme, value, TokenType.BOOL, stmt.mutable);
-            } else {
+            if (!(value instanceof Boolean)) {
                 throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Boolean.");
             }
         }
@@ -535,14 +531,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitFunctionStmt(Function stmt) {
-        CodeFunction function;
-        
-        if(functionEnvironment != null) {
-            function = new CodeFunction(stmt, new Environment(functionEnvironment));
-        } else {
-            function = new CodeFunction(stmt, new Environment());
-        }
-
+        CodeFunction function = new CodeFunction(stmt);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -553,18 +542,55 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         Scanner scanner = new java.util.Scanner(System.in);
         String line = scanner.nextLine();
 
-        code.Scanner tokenizer = new code.Scanner(line);
-        List<Token> tokens = tokenizer.scanTokens();
+        List<String> input = List.of(line.split(",")).stream()
+                .map(String::trim) // Trim each element using stream API
+                .collect(Collectors.toList());
+
+        List<Object> parsedInput = new ArrayList<>();
+
+        for (int i = 0; i < input.size(); i++) {
+            try {
+                int intVal = Integer.parseInt(input.get(i));
+                parsedInput.add(intVal);
+                continue;
+            } catch (NumberFormatException e) {
+            }
+
+            try {
+                double floatVal = Double.parseDouble(input.get(i));
+                parsedInput.add(floatVal);
+            } catch (NumberFormatException e) {
+                if (input.get(i).length() == 1) {
+                    char newChar = input.get(i).charAt(0);
+                    parsedInput.add(newChar);
+
+                } else {
+                    if (input.get(i).equals("\"TRUE\"")) {
+                        parsedInput.add(true);
+                    } else if (input.get(i).equals("\"FALSE\"")) {
+                        parsedInput.add(false);
+                    } else {
+                        parsedInput.add(input.get(i));
+                    }
+                }
+            }
+        }
+
+        if(input.size() > stmt.identifiers.size()) {
+            System.out.println("lol");
+            throw new RuntimeError(new Token(null, line, parsedInput, 0), "Expected " + stmt.identifiers.size() + " values for variables a, b, and c. Received more than 3 values.");
+        }
 
         int current = 0;
         int current2 = 0;
         while (current2 < stmt.identifiers.size()) {
-            Object value = tokens.get(current).literal;
+            Object value = parsedInput.get(current);
             environment.assign(stmt.identifiers.get(current2), value);
             current += 2;
             current2++;
         }
         return null;
+
     }
 
     @Override

@@ -2,13 +2,13 @@ package code;
 
 import java.util.List;
 
+import code.Stmt.Bool;
+
 public class CodeFunction implements CodeCallable {
     private final Stmt.Function declaration;
-    private final Environment closure;
 
-    CodeFunction(Stmt.Function declaration, Environment closure) {
+    CodeFunction(Stmt.Function declaration) {
         this.declaration = declaration;
-        this.closure = closure;
     }
 
     @Override
@@ -18,30 +18,52 @@ public class CodeFunction implements CodeCallable {
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        Environment environment = closure;
+        Environment environment = new Environment(interpreter.globals);
 
         for (int i = 0; i < declaration.params.size(); i++) {
-            TokenType type = declaration.params.get(i).type.type;
+            Token type = declaration.params.get(i).type;
             Object value = arguments.get(i);
-            if (type == TokenType.STRING) {
-                environment.define(declaration.params.get(i).name.lexeme, value, declaration.params.get(i).type.type,
-                        true);
-            } else if (type == TokenType.CHAR) {
-                environment.define(declaration.params.get(i).name.lexeme, value, declaration.params.get(i).type.type,
-                        true);
 
-            } else if (type == TokenType.INT) {
-                environment.define(declaration.params.get(i).name.lexeme, value, declaration.params.get(i).type.type,
-                        true);
-
-            } else if (type == TokenType.FLOAT) {
-                environment.define(declaration.params.get(i).name.lexeme, value, declaration.params.get(i).type.type,
-                        true);
-
-            } else {
-                environment.define(declaration.params.get(i).name.lexeme, value, declaration.params.get(i).type.type,
-                        true);
-
+            if (type.type == TokenType.STRING) {
+                if (value instanceof String) {
+                    environment.define(declaration.params.get(i).name.lexeme, value,
+                            declaration.params.get(i).type.type, true);
+                } else {
+                    throw new RuntimeError(declaration.name,
+                            "Incompatible types. Cannot convert " + value + " to String");
+                }
+            } else if (type.type == TokenType.CHAR) {
+                if (value instanceof Character) {
+                    environment.define(declaration.params.get(i).name.lexeme, value,
+                            declaration.params.get(i).type.type, true);
+                } else {
+                    throw new RuntimeError(declaration.name,
+                            "Incompatible types. Cannot convert " + value + " to Character");
+                }
+            } else if (type.type == TokenType.INT) {
+                if (value instanceof Integer) {
+                    environment.define(declaration.params.get(i).name.lexeme, value,
+                            declaration.params.get(i).type.type, true);
+                } else {
+                    throw new RuntimeError(declaration.name,
+                            "Incompatible types. Cannot convert " + value + " to Integer");
+                }
+            } else if (type.type == TokenType.FLOAT) {
+                if (value instanceof Double) {
+                    environment.define(declaration.params.get(i).name.lexeme, value,
+                            declaration.params.get(i).type.type, true);
+                } else {
+                    throw new RuntimeError(declaration.name,
+                            "Incompatible types. Cannot convert " + value + " to Float");
+                }
+            } else if (type.type == TokenType.BOOL) {
+                if (value instanceof Boolean) {
+                    environment.define(declaration.params.get(i).name.lexeme, value,
+                            declaration.params.get(i).type.type, true);
+                } else {
+                    throw new RuntimeError(declaration.name,
+                            "Incompatible types. Cannot convert " + value + " to Boolean");
+                }
             }
         }
 
