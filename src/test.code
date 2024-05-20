@@ -1,12 +1,8 @@
-FN TEST()
-BEGIN FN
-
-DISPLAY: "LOL"
-
-END FN
-
 BEGIN CODE
-TEST()
+INT a
+SCAN: a
+IF(a < 5)
+    BEGIN IF
+    DISPLAY: a + 10
+    END IF
 END CODE
-
-BEGIN CODE
