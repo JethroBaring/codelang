@@ -2,6 +2,7 @@ package code;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.lang.String;
 
 import code.Expr.Assign;
 import code.Expr.Binary;
@@ -245,15 +246,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 }
                 break;
             case AMPERSAND:
-                if (left instanceof Boolean && right instanceof Boolean) {
-                    return left.toString().toUpperCase() + right.toString().toUpperCase();
-                } else if (left instanceof Boolean) {
-                    return left.toString().toUpperCase() + right.toString();
-                } else if (right instanceof Boolean) {
-                    return left.toString() + right.toString().toUpperCase();
-                } else {
-                    return left.toString() + right.toString();
-                }
+                String leftValue = (left != null) ? left.toString() : "";
+                String rightValue = (right != null) ? right.toString() : "";
+
+                if (left instanceof Boolean)
+                    leftValue = left.toString().toUpperCase();
+                if (right instanceof Boolean)
+                    rightValue = right.toString().toUpperCase();
+
+                return leftValue + rightValue;
+
             case MODULO:
                 checkNumberOperands(expr.operator, left, right);
                 if (left instanceof Integer && right instanceof Integer) {
