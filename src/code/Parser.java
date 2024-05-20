@@ -31,8 +31,11 @@ public class Parser {
                 TokenType.IMMUTABLE)) {
             statements.addAll(varDeclaration());
         }
-        afterVarDeclaration = true;
         while (!isAtEnd() && !check(TokenType.END)) {
+            if (check(TokenType.STRING) || check(TokenType.CHAR) || check(TokenType.INT) || check(TokenType.FLOAT)
+                    || check(TokenType.BOOL) || check(TokenType.IMMUTABLE)) {
+                afterVarDeclaration = true;
+            }
             statements.add(statement());
         }
 
@@ -127,7 +130,7 @@ public class Parser {
     }
 
     private Stmt displayStatement() {
-        Expr value = expression();
+        Expr value = or();
         return new Stmt.Print(value);
     }
 
@@ -250,6 +253,10 @@ public class Parser {
             Expr initializer = null;
             if (match(TokenType.EQUAL)) {
                 initializer = expression();
+                if (!isValidType(token.type)) {
+                    throw error(name,
+                            "Type mismatch: " + getLiteralType(tokens.get(current - 1).type) + " cannot be converted to " + token.type);
+                }
             }
 
             initializers.add(initializer);
@@ -348,7 +355,7 @@ public class Parser {
             }
         }
         String message = "Expect 'END' after function body.";
-        if(hasReturn) {
+        if (hasReturn) {
             message = "Expecting 'END' after return statement";
         }
         consume(TokenType.END, message);
@@ -460,8 +467,9 @@ public class Parser {
             return new Expr.Variable(previous());
         }
 
+        // System.out.println(tokens.get(current));
         String message = "Expect expression.";
-        if(afterVarDeclaration) {
+        if (afterVarDeclaration) {
             message = "You can only declare variable at the topmost part.";
         }
         throw error(peek(), message);
@@ -475,7 +483,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Code.error(token, "Syntax Error:" + message);
+        Code.error(token, message);
         return new ParseError();
     }
 
@@ -540,4 +548,39 @@ public class Parser {
         return peek().type == type;
     }
 
+    private boolean isValidType(TokenType varType) {
+        switch (varType) {
+            case INT:
+                return tokens.get(current - 1).type == TokenType.INT_LITERAL;
+            case STRING:
+                return tokens.get(current - 1).type == TokenType.STRING_LITERAL;
+            case CHAR:
+                return tokens.get(current - 1).type == TokenType.CHAR_LITERAL;
+            case FLOAT:
+                return tokens.get(current - 1).type == TokenType.FLOAT_LITERAL;
+            case BOOL:
+                return tokens.get(current - 1).type == TokenType.TRUE_LITERAL
+                        || tokens.get(current - 1).type == TokenType.FALSE_LITERAL;
+            default:
+                return false;
+        }
+    }
+
+    private String getLiteralType(TokenType type) {
+        switch (type) {
+            case STRING_LITERAL:
+                return "STRING";
+            case CHAR_LITERAL:
+                return "CHAR";
+            case INT_LITERAL:
+                return "INT";
+            case FLOAT_LITERAL:
+                return "FLOAT";
+            case TRUE_LITERAL:
+            case FALSE_LITERAL:
+                return "BOOLEAN";
+            default:
+                return "UNKNOWN";
+        }
+    }
 }

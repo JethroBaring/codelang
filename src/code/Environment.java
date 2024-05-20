@@ -2,6 +2,7 @@ package code;
 
 import java.util.HashMap;
 import java.util.Map;
+
 public class Environment {
     final Environment enclosing;
     private final Map<String, Variable> values = new HashMap<>();
@@ -61,8 +62,15 @@ public class Environment {
                         values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
                         return;
                     } else {
-                        throw new RuntimeError(name,
-                                "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                        if (value instanceof Boolean) {
+                            throw new RuntimeError(name,
+                                    "Cannot assign the value '" + value.toString().toUpperCase()
+                                            + "' to variable of type " + type + ".");
+                        } else {
+                            throw new RuntimeError(name,
+                                    "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                        }
+
                     }
                 case CHAR:
                     if (value instanceof Character) {
@@ -97,7 +105,7 @@ public class Environment {
                                 "Cannot assign the value '" + value + "' to variable of type " + type + ".");
                     }
             }
-            
+
         } else {
             throw new RuntimeError(name,
                     "Cannot assign the value '" + value + "' to an immutable variable");

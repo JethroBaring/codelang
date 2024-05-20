@@ -567,9 +567,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                     parsedInput.add(newChar);
 
                 } else {
-                    if (input.get(i).equals("\"TRUE\"")) {
+                    if (input.get(i).equals("TRUE")) {
                         parsedInput.add(true);
-                    } else if (input.get(i).equals("\"FALSE\"")) {
+                    } else if (input.get(i).equals("FALSE")) {
                         parsedInput.add(false);
                     } else {
                         parsedInput.add(input.get(i));
