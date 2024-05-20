@@ -52,14 +52,17 @@ public class Code {
         // System.out.println(token);
         // }
 
-        List<Token> tokens = scanner.scanTokens();
-        Parser parser = new Parser(tokens);
-        List<Stmt> statements = parser.parse();
-        if (hadError)
-            System.exit(65);
-        if (hadRuntimeError)
-            System.exit(70);
-        interpreter.interpret(statements);
+        try {
+            List<Token> tokens = scanner.scanTokens();
+            Parser parser = new Parser(tokens);
+            List<Stmt> statements = parser.parse();
+            if (hadError)
+                System.exit(65);
+            if (hadRuntimeError)
+                System.exit(70);
+            interpreter.interpret(statements);
+        } catch (Exception e) {
+        }
     }
 
     static void error(int line, int col, String message) {

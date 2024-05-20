@@ -31,9 +31,6 @@ public class Environment {
             return values.get(name.lexeme).getValue();
         }
 
-        if (enclosing != null)
-            return enclosing.get(name);
-
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
@@ -42,9 +39,6 @@ public class Environment {
             return values.get(name.lexeme).getType();
         }
 
-        if (enclosing != null)
-            return enclosing.getType(name);
-
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
@@ -52,9 +46,6 @@ public class Environment {
         if (values.containsKey(name.lexeme)) {
             return values.get(name.lexeme).isMutable();
         }
-
-        if (enclosing != null)
-            return enclosing.getMutability(name);
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
@@ -106,10 +97,7 @@ public class Environment {
                                 "Cannot assign the value '" + value + "' to variable of type " + type + ".");
                     }
             }
-            if (enclosing != null) {
-                enclosing.assign(name, value);
-                return;
-            }
+            
         } else {
             throw new RuntimeError(name,
                     "Cannot assign the value '" + value + "' to an immutable variable");

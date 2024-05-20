@@ -12,6 +12,7 @@ public class Parser {
 
     private final List<Token> tokens;
     private int current = 0;
+    private boolean afterVarDeclaration = false;
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -30,7 +31,7 @@ public class Parser {
                 TokenType.IMMUTABLE)) {
             statements.addAll(varDeclaration());
         }
-
+        afterVarDeclaration = true;
         while (!isAtEnd() && !check(TokenType.END)) {
             statements.add(statement());
         }
@@ -329,7 +330,7 @@ public class Parser {
     }
 
     private List<Stmt> block(TokenType type) {
-
+        boolean hasReturn = false;
         List<Stmt> statements = new ArrayList<>();
 
         while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL,
@@ -337,15 +338,20 @@ public class Parser {
             statements.addAll(varDeclaration());
         }
 
-        while (match(TokenType.FUNCTION) && !isAtEnd()) {
-            statements.add(function("function"));
-        }
-
         while (!isAtEnd() && !check(TokenType.END)) {
-            statements.add(statement());
+            if (check(TokenType.RETURN)) {
+                statements.add(statement());
+                hasReturn = true;
+                break;
+            } else {
+                statements.add(statement());
+            }
         }
-
-        consume(TokenType.END, "Expect 'END' after function body.");
+        String message = "Expect 'END' after function body.";
+        if(hasReturn) {
+            message = "Expecting 'END' after return statement";
+        }
+        consume(TokenType.END, message);
         if (peek().type == type) {
             consume(peek().type, "Expecting 'FN' after END");
         }
@@ -453,7 +459,12 @@ public class Parser {
         if (match(TokenType.IDENTIFIER)) {
             return new Expr.Variable(previous());
         }
-        throw error(peek(), "Expect expression.");
+
+        String message = "Expect expression.";
+        if(afterVarDeclaration) {
+            message = "You can only declare variable at the topmost part.";
+        }
+        throw error(peek(), message);
     }
 
     private Token consume(TokenType type, String message) {
@@ -464,7 +475,7 @@ public class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Code.error(token, message);
+        Code.error(token, "Syntax Error:" + message);
         return new ParseError();
     }
 
