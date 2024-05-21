@@ -1,4 +1,6 @@
 BEGIN CODE
-STRING x = "test"
-DISPLAY: x $
+
+INT a
+SCAN: a
+DISPLAY: a
 END CODE

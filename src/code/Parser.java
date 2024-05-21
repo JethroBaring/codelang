@@ -255,7 +255,8 @@ public class Parser {
                 initializer = expression();
                 if (!isValidType(token.type)) {
                     throw error(name,
-                            "Type mismatch: " + getLiteralType(tokens.get(current - 1).type) + " cannot be converted to " + token.type);
+                            "Type mismatch: " + getLiteralType(tokens.get(current - 1).type)
+                                    + " cannot be converted to " + token.type);
                 }
             }
 
@@ -456,7 +457,7 @@ public class Parser {
         if (match(TokenType.NULL))
             return new Expr.Literal(null);
         if (match(TokenType.STRING_LITERAL, TokenType.CHAR_LITERAL,
-                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL, TokenType.DOLLAR_SIGN))
+                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL))
             return new Expr.Literal(previous().literal);
         if (match(TokenType.LEFT_PARENTHESIS)) {
             Expr expr = expression();
@@ -467,7 +468,15 @@ public class Parser {
             return new Expr.Variable(previous());
         }
 
-        // System.out.println(tokens.get(current));
+        if (match(TokenType.DOLLAR_SIGN)) {
+            if (tokens.get(current - 2).type == TokenType.AMPERSAND || previous().type == TokenType.DOLLAR_SIGN) {
+                return new Expr.Literal(previous().literal);
+
+            } else {
+                throw error(peek(), "Invalid usage of $.");
+            }
+        }
+
         String message = "Expect expression.";
         if (afterVarDeclaration) {
             message = "You can only declare variable at the topmost part.";

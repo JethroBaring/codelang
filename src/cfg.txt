@@ -40,7 +40,7 @@ returnStmt -> "RETURN" expression?
 block -> ( "IF" | "ELSE" | "WHILE" ) "(" expression ")" blockContent
 blockContent -> "BEGIN" ( "IF" | "WHILE" ) statement* "END" ( "IF" | "WHILE" )
 exprStmt -> expression
-printStmt -> "print" expression
+printStmt -> "DISPLAY" ":" expression
 scanStmt -> IDENTIFIER ( "," IDENTIFIER)*
 
 expression -> literal | unary | binary | grouping
