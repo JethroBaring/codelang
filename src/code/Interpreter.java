@@ -332,6 +332,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         try {
             this.environment = environment;
             for (Stmt statement : statements) {
+                if (statement instanceof Stmt.Print) {
+                    hasDisplay = true;
+                }
                 execute(statement);
             }
         } finally {
@@ -409,7 +412,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (!(value instanceof String)) {
-                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type String.");
+                Object v = value;
+                if (value instanceof Boolean) {
+                    v = value.toString().toUpperCase();
+                }
+                throw new RuntimeError(stmt.name, "Value '" + v + "' is not of type String.");
             }
         }
         environment.define(stmt.name.lexeme, value, TokenType.STRING, stmt.mutable);
@@ -422,7 +429,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (!(value instanceof Integer)) {
-                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Integer.");
+                Object v = value;
+                if (value instanceof Boolean) {
+                    v = value.toString().toUpperCase();
+                }
+                throw new RuntimeError(stmt.name, "Value '" + v + "' is not of type Integer.");
             }
         }
         environment.define(stmt.name.lexeme, value, TokenType.INT, stmt.mutable);
@@ -435,7 +446,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (!(value instanceof Double)) {
-                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Float.");
+                Object v = value;
+                if (value instanceof Boolean) {
+                    v = value.toString().toUpperCase();
+                }
+                throw new RuntimeError(stmt.name, "Value '" + v + "' is not of type Float.");
             }
         }
         environment.define(stmt.name.lexeme, value, TokenType.FLOAT, stmt.mutable);
@@ -448,7 +463,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
             if (!(value instanceof Character)) {
-                throw new RuntimeError(stmt.name, "Value '" + value + "' is not of type Character.");
+                Object v = value;
+                if (value instanceof Boolean) {
+                    v = value.toString().toUpperCase();
+                }
+                throw new RuntimeError(stmt.name, "Value '" + v + "' is not of type Character.");
             }
         }
         environment.define(stmt.name.lexeme, value, TokenType.CHAR, stmt.mutable);
@@ -491,12 +510,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     public Object visitIfStmt(If stmt) {
         if (isTruthy(evaluate(stmt.condition))) {
             for (Stmt statement : stmt.thenBranch) {
+                if (statement instanceof Stmt.Print) {
+                    hasDisplay = true;
+                }
                 execute(statement);
             }
         } else {
             for (int i = 0; i < stmt.elseIfBranches.size(); i++) {
                 if (isTruthy(evaluate(stmt.elseIfConditions.get(i)))) {
                     for (Stmt statement : stmt.elseIfBranches.get(i)) {
+                        if (statement instanceof Stmt.Print) {
+                            hasDisplay = true;
+                        }
                         execute(statement);
                         return null;
                     }
@@ -505,6 +530,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
             if (stmt.elseBranch != null) {
                 for (Stmt statement : stmt.elseBranch) {
+                    if (statement instanceof Stmt.Print) {
+                        hasDisplay = true;
+                    }
                     execute(statement);
                 }
             }
@@ -586,9 +614,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
 
         if (input.size() > stmt.identifiers.size()) {
-            System.out.println("lol");
-            throw new RuntimeError(new Token(null, line, parsedInput, 0), "Expected " + stmt.identifiers.size()
-                    + " values for variables a, b, and c. Received more than 3 values.");
+            String m = "value";
+            if(stmt.identifiers.size() > 1) {
+                m = "values";
+            }
+            throw new RuntimeError(stmt.identifiers.get(0), "Expected " + stmt.identifiers.size()
+                     + " " + m +". Received more than " + stmt.identifiers.size() + " " + m + ".");
         }
 
         int current = 0;
@@ -631,6 +662,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         if (stmt.value != null)
             value = evaluate(stmt.value);
 
-        throw new code.Return(value);
+        throw new code.Return(value, stmt.keyword);
     }
 }

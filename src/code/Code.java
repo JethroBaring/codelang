@@ -85,16 +85,11 @@ public class Code {
 
     private static void report(int line, int col, String where, String message) {
         System.err.println("[Line " + line + "] Syntax Error : " + message);
-        // System.err.println(
-        //         "[Ln " + line + ", Col " + col + "] Error" + where + ": " + message);
         hadError = true;
     }
 
     static void runtimeError(RuntimeError e) {
         System.err.println("[Line " + e.token.line + "] Runtime Error : " + e.getMessage());
-
-        // System.err.println(e.getMessage() +
-        //         "\n[line " + e.token.line + "]");
         hadRuntimeError = true;
     }
 

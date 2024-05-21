@@ -1,5 +1,5 @@
 BEGIN CODE
-
-INT a
-SCAN: a
+	BOOL num = "TRUEE"
+	SCAN: num
+    DISPLAY: num
 END CODE

@@ -28,13 +28,20 @@ public class Parser {
         consume(TokenType.CODE, "Expecting 'CODE' after BEGIN");
 
         while (match(TokenType.STRING, TokenType.CHAR, TokenType.INT, TokenType.FLOAT, TokenType.BOOL,
-                TokenType.IMMUTABLE)) {
+                TokenType.IMMUTABLE, TokenType.RETURN)) {
+            if (previous().type == TokenType.RETURN) {
+                throw error(previous(), "Return statement should only be inside a function.");
+            }
             statements.addAll(varDeclaration());
         }
         while (!isAtEnd() && !check(TokenType.END)) {
             if (check(TokenType.STRING) || check(TokenType.CHAR) || check(TokenType.INT) || check(TokenType.FLOAT)
                     || check(TokenType.BOOL) || check(TokenType.IMMUTABLE)) {
                 afterVarDeclaration = true;
+            }
+
+            if (check(TokenType.RETURN)) {
+                throw error(peek(), "Return statement should only be inside a function.");
             }
             statements.add(statement());
         }
@@ -56,7 +63,7 @@ public class Parser {
             }
 
         }
-        
+
         return statements;
     }
 
@@ -165,6 +172,10 @@ public class Parser {
 
         List<Stmt> thenBranch = new ArrayList<>();
         while (!isAtEnd() && !check(TokenType.END)) {
+            if (check(TokenType.STRING) || check(TokenType.CHAR) || check(TokenType.INT) || check(TokenType.FLOAT)
+                    || check(TokenType.BOOL) || check(TokenType.IMMUTABLE)) {
+                afterVarDeclaration = true;
+            }
             thenBranch.add(statement());
         }
 
@@ -225,6 +236,10 @@ public class Parser {
 
         List<Stmt> body = new ArrayList<>();
         while (!isAtEnd() && !check(TokenType.END)) {
+            if (check(TokenType.STRING) || check(TokenType.CHAR) || check(TokenType.INT) || check(TokenType.FLOAT)
+                    || check(TokenType.BOOL) || check(TokenType.IMMUTABLE)) {
+                afterVarDeclaration = true;
+            }
             body.add(statement());
         }
 
@@ -253,11 +268,11 @@ public class Parser {
             Expr initializer = null;
             if (match(TokenType.EQUAL)) {
                 initializer = expression();
-                if (!isValidType(token.type)) {
-                    throw error(name,
-                            "Type mismatch: " + getLiteralType(tokens.get(current - 1).type)
-                                    + " cannot be converted to " + token.type);
-                }
+                // if (!isValidType(token.type)) {
+                // throw error(name,
+                // "Type mismatch: " + getLiteralType(tokens.get(current - 1).type)
+                // + " cannot be converted to " + token.type);
+                // }
             }
 
             initializers.add(initializer);
@@ -333,11 +348,11 @@ public class Parser {
         consume(TokenType.BEGIN, "Expect 'BEGIN' before 'FN'.");
         consume(TokenType.FUNCTION, "Expect 'FN' before " + kind + " body.");
 
-        List<Stmt> body = block(TokenType.FUNCTION);
+        List<Stmt> body = block(TokenType.FUNCTION, returnType);
         return new Stmt.Function(name, parameters, body, returnType);
     }
 
-    private List<Stmt> block(TokenType type) {
+    private List<Stmt> block(TokenType type, Token returnType) {
         boolean hasReturn = false;
         List<Stmt> statements = new ArrayList<>();
 
@@ -355,10 +370,16 @@ public class Parser {
                 statements.add(statement());
             }
         }
+
         String message = "Expect 'END' after function body.";
         if (hasReturn) {
             message = "Expecting 'END' after return statement";
         }
+
+        if (!hasReturn && returnType != null) {
+            throw error(returnType, "Function declared with return type but has no return statement.");
+        }
+
         consume(TokenType.END, message);
         if (peek().type == type) {
             consume(peek().type, "Expecting 'FN' after END");
@@ -457,7 +478,7 @@ public class Parser {
         if (match(TokenType.NULL))
             return new Expr.Literal(null);
         if (match(TokenType.STRING_LITERAL, TokenType.CHAR_LITERAL,
-                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL))
+                TokenType.INT_LITERAL, TokenType.FLOAT_LITERAL, TokenType.DOLLAR_SIGN))
             return new Expr.Literal(previous().literal);
         if (match(TokenType.LEFT_PARENTHESIS)) {
             Expr expr = expression();
@@ -468,18 +489,9 @@ public class Parser {
             return new Expr.Variable(previous());
         }
 
-        if (match(TokenType.DOLLAR_SIGN)) {
-            if (tokens.get(current - 2).type == TokenType.AMPERSAND || previous().type == TokenType.DOLLAR_SIGN) {
-                return new Expr.Literal(previous().literal);
-
-            } else {
-                throw error(peek(), "Invalid usage of $.");
-            }
-        }
-
         String message = "Expect expression.";
         if (afterVarDeclaration) {
-            message = "You can only declare variable at the topmost part.";
+            message = "You can only declare variable after the begin code.";
         }
         throw error(peek(), message);
     }
@@ -570,6 +582,8 @@ public class Parser {
             case BOOL:
                 return tokens.get(current - 1).type == TokenType.TRUE_LITERAL
                         || tokens.get(current - 1).type == TokenType.FALSE_LITERAL;
+            case IDENTIFIER:
+                return true;
             default:
                 return false;
         }

@@ -62,14 +62,12 @@ public class Environment {
                         values.put(name.lexeme, new Variable(TokenType.STRING, value, mutable));
                         return;
                     } else {
+                        Object v = value;
                         if (value instanceof Boolean) {
-                            throw new RuntimeError(name,
-                                    "Cannot assign the value '" + value.toString().toUpperCase()
-                                            + "' to variable of type " + type + ".");
-                        } else {
-                            throw new RuntimeError(name,
-                                    "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                            v = value.toString().toUpperCase();
                         }
+                        throw new RuntimeError(name,
+                                "Cannot assign the value '" + v + "' to variable of type String.");
 
                     }
                 case CHAR:
@@ -77,24 +75,36 @@ public class Environment {
                         values.put(name.lexeme, new Variable(TokenType.CHAR, value, mutable));
                         return;
                     } else {
+                        Object v = value;
+                        if (value instanceof Boolean) {
+                            v = value.toString().toUpperCase();
+                        }
                         throw new RuntimeError(name,
-                                "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                                "Cannot assign the value '" + v + "' to variable of type Character.");
                     }
                 case INT:
                     if (value instanceof Integer) {
                         values.put(name.lexeme, new Variable(TokenType.INT, value, mutable));
                         return;
                     } else {
+                        Object v = value;
+                        if (value instanceof Boolean) {
+                            v = value.toString().toUpperCase();
+                        }
                         throw new RuntimeError(name,
-                                "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                                "Cannot assign the value '" + v + "' to variable of type Integer.");
                     }
                 case FLOAT:
                     if (value instanceof Double) {
                         values.put(name.lexeme, new Variable(TokenType.FLOAT, value, mutable));
                         return;
                     } else {
+                        Object v = value;
+                        if (value instanceof Boolean) {
+                            v = value.toString().toUpperCase();
+                        }
                         throw new RuntimeError(name,
-                                "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                                "Cannot assign the value '" + v + "' to variable of type Float.");
                     }
                 case BOOL:
                     if (value instanceof Boolean) {
@@ -102,7 +112,7 @@ public class Environment {
                         return;
                     } else {
                         throw new RuntimeError(name,
-                                "Cannot assign the value '" + value + "' to variable of type " + type + ".");
+                                "Cannot assign the value '" + value + "' to variable of type Boolean.");
                     }
             }
 

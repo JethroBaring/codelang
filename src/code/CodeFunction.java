@@ -10,7 +10,7 @@ public class CodeFunction implements CodeCallable {
     CodeFunction(Stmt.Function declaration) {
         this.declaration = declaration;
     }
-
+    
     @Override
     public int arity() {
         return declaration.params.size();
@@ -75,36 +75,36 @@ public class CodeFunction implements CodeCallable {
                     if (returnValue.value instanceof String) {
                         return returnValue.value;
                     }
-                    return new RuntimeError(declaration.name, "Return value must be of type String");
+                    throw new RuntimeError(returnValue.keyword, "Return value must be of type String");
                 } else if (declaration.returnType.type == TokenType.CHAR) {
                     if (returnValue.value instanceof Character) {
                         return returnValue.value;
                     }
-                    return new RuntimeError(declaration.name, "Return value must be of type Character");
+                    throw new RuntimeError(returnValue.keyword, "Return value must be of type Character");
 
                 } else if (declaration.returnType.type == TokenType.INT) {
                     if (returnValue.value instanceof Integer) {
                         return returnValue.value;
                     }
-                    return new RuntimeError(declaration.name, "Return value must be of type Integer");
+                    throw new RuntimeError(returnValue.keyword, "Return value must be of type Integer");
 
                 } else if (declaration.returnType.type == TokenType.FLOAT) {
                     if (returnValue.value instanceof Double) {
                         return returnValue.value;
                     }
-                    return new RuntimeError(declaration.name, "Return value must be of type Float");
+                    throw new RuntimeError(returnValue.keyword, "Return value must be of type Float");
 
                 } else if (declaration.returnType.type == TokenType.BOOL) {
                     if (returnValue.value instanceof Boolean) {
                         return returnValue.value;
                     }
-                    return new RuntimeError(declaration.name, "Return value must be of type Boolean");
+                    throw new RuntimeError(returnValue.keyword, "Return value must be of type Boolean");
                 }
             }
 
             if (declaration.returnType == null) {
                 if (returnValue.value != null) {
-                    throw new RuntimeError(declaration.name,
+                    throw new RuntimeError(returnValue.keyword,
                             "Function with void return type shouldn't return anything. ");
                 }
 
