@@ -31,6 +31,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     final Environment globals = new Environment();
     private Environment environment = globals;
+    private boolean hasDisplay = false;
 
     Interpreter() {
         globals.define("clock", new CodeCallable() {
@@ -166,7 +167,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) {
+                if (statement instanceof Stmt.Print) {
+                    hasDisplay = true;
+                }
                 execute(statement);
+            }
+            if (!hasDisplay) {
+                System.out.println("No Error.");
             }
         } catch (RuntimeError e) {
             Code.runtimeError(e);
@@ -578,9 +585,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
             }
         }
 
-        if(input.size() > stmt.identifiers.size()) {
+        if (input.size() > stmt.identifiers.size()) {
             System.out.println("lol");
-            throw new RuntimeError(new Token(null, line, parsedInput, 0), "Expected " + stmt.identifiers.size() + " values for variables a, b, and c. Received more than 3 values.");
+            throw new RuntimeError(new Token(null, line, parsedInput, 0), "Expected " + stmt.identifiers.size()
+                    + " values for variables a, b, and c. Received more than 3 values.");
         }
 
         int current = 0;
