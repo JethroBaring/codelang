@@ -623,12 +623,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
 
         int current = 0;
-        int current2 = 0;
-        while (current2 < stmt.identifiers.size()) {
+        while (current < stmt.identifiers.size()) {
             Object value = parsedInput.get(current);
-            environment.assign(stmt.identifiers.get(current2), value);
-            current += 2;
-            current2++;
+            environment.assign(stmt.identifiers.get(current), value);
+            current += 1;
         }
         return null;
 
