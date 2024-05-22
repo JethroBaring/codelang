@@ -153,9 +153,9 @@ public class Scanner {
         break;
       case '\'':
         if (peekNext() == '\'') {
-          char escapedCharacter = advance();
+          char character = advance();
           start += 1;
-          addToken(TokenType.CHAR_LITERAL, escapedCharacter);
+          addToken(TokenType.CHAR_LITERAL, character);
           advance();
         }
         break;
