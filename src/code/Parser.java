@@ -227,12 +227,12 @@ public class Parser {
     }
 
     private Stmt whileStatement() {
-        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after IF.");
+        consume(TokenType.LEFT_PARENTHESIS, "Expecting '(' after WHILE.");
         Expr condition = expression();
         consume(TokenType.RIGHT_PARENTHESIS, "Expecting ')' after an expression");
 
         consume(TokenType.BEGIN, "Expecting a BEGIN after Condition.");
-        consume(TokenType.WHILE, "Expecting an IF after BEGIN");
+        consume(TokenType.WHILE, "Expecting an WHILE after BEGIN");
 
         List<Stmt> body = new ArrayList<>();
         while (!isAtEnd() && !check(TokenType.END)) {
@@ -244,7 +244,7 @@ public class Parser {
         }
 
         consume(TokenType.END, "Expecting END after a statement.");
-        consume(TokenType.WHILE, "Expecting IF after END");
+        consume(TokenType.WHILE, "Expecting WHILE after END");
 
         return new Stmt.While(condition, body);
 
