@@ -249,7 +249,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left + (int) right;
                 } else if (left instanceof Double && right instanceof Double) {
-                    return (double) left * (double) right;
+                    return (double) left + (double) right;
                 }
                 break;
             case AMPERSAND:
@@ -373,22 +373,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         throw new RuntimeError(operator, "Operand must be an integer or a float nuimber.");
     }
 
-    private String stringify(Object object) {
-        if (object == null)
-            return "null";
-
-        if (object instanceof Double) {
-            String text = object.toString();
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length() - 2);
-            }
-
-            return text;
-        }
-
-        return object.toString();
-    }
-
     @Override
     public Void visitExpressionStmt(Expression stmt) {
         evaluate(stmt.expression);
@@ -399,9 +383,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     public Void visitPrintStmt(Print stmt) {
         Object value = evaluate(stmt.expression);
         if (value instanceof Boolean) {
-            System.out.println(value.toString().toUpperCase());
+            System.out.print(value.toString().toUpperCase());
         } else {
-            System.out.println(stringify(value));
+            System.out.print(value.toString());
         }
         return null;
     }
@@ -508,6 +492,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitIfStmt(If stmt) {
+
         if (isTruthy(evaluate(stmt.condition))) {
             for (Stmt statement : stmt.thenBranch) {
                 if (statement instanceof Stmt.Print) {
@@ -524,6 +509,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                         }
                         execute(statement);
                         return null;
+                    }
+                } else {
+                    for (Stmt statement : stmt.elseIfBranches.get(i)) {
+                        if (statement instanceof Stmt.Print) {
+                            hasDisplay = true;
+                        }
                     }
                 }
             }
@@ -559,6 +550,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     public Object visitWhileStmt(While stmt) {
         while (isTruthy(evaluate(stmt.condition))) {
             for (Stmt statement : stmt.body) {
+                if (statement instanceof Stmt.Print) {
+                    hasDisplay = true;
+                }
                 execute(statement);
             }
         }
@@ -615,18 +609,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
         if (input.size() > stmt.identifiers.size()) {
             String m = "value";
-            if(stmt.identifiers.size() > 1) {
+            if (stmt.identifiers.size() > 1) {
                 m = "values";
             }
             throw new RuntimeError(stmt.identifiers.get(0), "Expected " + stmt.identifiers.size()
-                     + " " + m +". Received more than " + stmt.identifiers.size() + " " + m + ".");
+                    + " " + m + ". Received more than " + stmt.identifiers.size() + " " + m + ".");
         }
 
         int current = 0;
         while (current < stmt.identifiers.size()) {
+        while (current < stmt.identifiers.size()) {
             Object value = parsedInput.get(current);
             environment.assign(stmt.identifiers.get(current), value);
             current += 1;
+            environment.assign(stmt.identifiers.get(current), value);
+            current++;
         }
         return null;
 

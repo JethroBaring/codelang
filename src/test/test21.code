@@ -1,8 +1,20 @@
 BEGIN CODE
-INT a=100, b=200, c=300
-BOOL d="TRUE"
-IF (a == 101)
-BEGIN IF
-	DISPLAY: a
-END IF
+	STRING
+	INT a=100, b=200, c=300
+	BOOL d="TRUE"
+
+	IF (a == 101)
+	BEGIN IF
+		DISPLAY: a
+	END IF
+	ELSE IF (b==200)
+	BEGIN IF
+		# Else if statement body
+		DISPLAY: b
+	END IF
+	ELSE IF (c==300)
+	BEGIN IF
+		# Else if statement body
+		DISPLAY: c
+	END IF
 END CODE

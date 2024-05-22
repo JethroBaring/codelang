@@ -1,5 +1,5 @@
 BEGIN CODE
-	BOOL num = "TRUEE"
-	SCAN: num
-    DISPLAY: num
+END CODE
+# Hi
+BEGIN CODE
 END CODE

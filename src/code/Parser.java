@@ -568,42 +568,4 @@ public class Parser {
             return false;
         return peek().type == type;
     }
-
-    private boolean isValidType(TokenType varType) {
-        switch (varType) {
-            case INT:
-                return tokens.get(current - 1).type == TokenType.INT_LITERAL;
-            case STRING:
-                return tokens.get(current - 1).type == TokenType.STRING_LITERAL;
-            case CHAR:
-                return tokens.get(current - 1).type == TokenType.CHAR_LITERAL;
-            case FLOAT:
-                return tokens.get(current - 1).type == TokenType.FLOAT_LITERAL;
-            case BOOL:
-                return tokens.get(current - 1).type == TokenType.TRUE_LITERAL
-                        || tokens.get(current - 1).type == TokenType.FALSE_LITERAL;
-            case IDENTIFIER:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private String getLiteralType(TokenType type) {
-        switch (type) {
-            case STRING_LITERAL:
-                return "STRING";
-            case CHAR_LITERAL:
-                return "CHAR";
-            case INT_LITERAL:
-                return "INT";
-            case FLOAT_LITERAL:
-                return "FLOAT";
-            case TRUE_LITERAL:
-            case FALSE_LITERAL:
-                return "BOOLEAN";
-            default:
-                return "UNKNOWN";
-        }
-    }
 }
