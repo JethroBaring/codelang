@@ -59,10 +59,10 @@ public class Scanner {
     char c = advance();
     switch (c) {
       case '(':
-        addToken(TokenType.LEFT_PARENTHESIS, null);
+        addToken(TokenType.LEFT_PARENTHESIS);
         break;
       case ')':
-        addToken(TokenType.RIGHT_PARENTHESIS, null);
+        addToken(TokenType.RIGHT_PARENTHESIS);
         break;
       case '[':
         if (peekNext() == ']') {
